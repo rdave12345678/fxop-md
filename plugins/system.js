@@ -28,7 +28,7 @@ Module(
    },
    async message => {
       await message.sendReply("*_Restarting, hold on_*");
-      exec("npm restart all", (error, stdout, stderr) => {
+      exec("pm2 restart", (error, stdout, stderr) => {
          if (error) {
             console.error(`Error restarting process: ${error.message}`);
             return;
