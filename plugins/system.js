@@ -229,7 +229,7 @@ Module(
 
       const { prefix } = message;
       const [date, time] = new Date().toLocaleString("en-IN", { timeZone: TIME_ZONE }).split(",");
-      let menu = `\`\`\`╭─ ${BOT_INFO.split(";")[1]} ───⊷
+      let menu = `\`\`\`╭─ ${BOT_INFO.split(";")[1]} ───
 │ User:  ${message.pushName}
 │ Prefix: ${prefix}
 │ Date: ${date}
@@ -238,7 +238,7 @@ Module(
 │ Uptime: ${runtime(process.uptime())} 
 │ Ram: ${formatBytes(os.totalmem() - os.freemem())} / ${formatBytes(os.totalmem())}
 │ Version: ${require("../package.json").version}
-╰────────────────⊷\`\`\`\n`;
+╰────────────────\`\`\`\n`;
 
       const categorizedCommands = plugins.commands.reduce((acc, command) => {
          if (command.pattern instanceof RegExp && !command.dontAddCommandList) {
@@ -253,11 +253,11 @@ Module(
       Object.keys(categorizedCommands)
          .sort()
          .forEach(category => {
-            menu += `\n╭── *${tiny(category)}* ──────⊷\n`;
+            menu += `\n╭── *${tiny(category)}* ──────\n`;
             categorizedCommands[category].forEach(cmd => {
-               menu += `│◌ ${cmd}\n`;
+               menu += `│ ${cmd}\n`;
             });
-            menu += `╰──────────────⊷\n`;
+            menu += `╰──────────────\n`;
          });
 
       const menuMedia = BOT_INFO.split(";")[2];
