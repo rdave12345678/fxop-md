@@ -9,25 +9,6 @@ const { BOT_INFO, TIME_ZONE } = require("../config");
 
 Module(
    {
-      pattern: /^\$|^>/,
-      fromMe: true,
-      desc: "Evaluate JavaScript code",
-      dontAddCommandList: true,
-   },
-   async (message, match) => {
-      const code = message.text.slice(1).trim();
-      try {
-         const result = eval(code);
-         const output = typeof result === "string" ? result : JSON.stringify(result, null, 2);
-         await message.reply(`Execution Result:\n\`\`\`\n${output}\n\`\`\``);
-      } catch (error) {
-         await message.reply(`Error:\n\`\`\`\n${error.message}\n\`\`\``);
-      }
-   }
-);
-
-Module(
-   {
       pattern: "runtime",
       fromMe: mode,
       desc: "Check uptime of bot",
