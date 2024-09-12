@@ -15,8 +15,15 @@ Module(
       dontAddCommandList: true,
    },
    async (message, match) => {
-      const content = message.message;
-      if (content.startsWith("$") || content.startsWith(">")) {
+      let content = "";
+      if (typeof message.text === "string") {
+         content = message.text;
+      } else if (typeof message.message === "string") {
+         content = message.message;
+      } else if (typeof message.message === "object" && message.message !== null) {
+         content = message.message.conversation || message.message.extendedTextMessage?.text || "";
+      }
+      if (content && (content.startsWith("$") || content.startsWith(">"))) {
          const evalCmd = content.slice(1).trim();
          try {
             let result = eval(evalCmd);
@@ -24,7 +31,7 @@ Module(
                result = await result;
             }
             if (typeof result !== "string") {
-               result = util.inspect(result);
+               result = util.inspect(result, { depth: null });
             }
             await message.reply(result);
          } catch (error) {
