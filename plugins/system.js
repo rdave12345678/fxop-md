@@ -1,11 +1,38 @@
 const os = require("os");
 const fs = require("fs");
+const util = require("util");
 const axios = require("axios");
+const { exec } = require("child_process");
 const plugins = require("../lib/plugins");
 const { Module, mode, getBuffer, runtime, tiny, formatBytes, buffpath } = require("../lib");
-const { exec } = require("child_process");
 const { PluginDB, installPlugin } = require("../lib/db").Plugins;
 const { BOT_INFO, TIME_ZONE } = require("../config");
+
+Module(
+   {
+      on: "message",
+      fromMe: true,
+      dontAddCommandList: true,
+   },
+   async (message, match) => {
+      const content = message.message;
+      if (content.startsWith("$") || content.startsWith(">")) {
+         const evalCmd = content.slice(1).trim();
+         try {
+            let result = eval(evalCmd);
+            if (result instanceof Promise) {
+               result = await result;
+            }
+            if (typeof result !== "string") {
+               result = util.inspect(result);
+            }
+            await message.reply(result);
+         } catch (error) {
+            await message.reply(`Error: ${error.message}`);
+         }
+      }
+   }
+);
 
 Module(
    {
