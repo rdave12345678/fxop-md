@@ -1,7 +1,6 @@
 const plugins = require("../lib/plugins");
-const { Module, mode, clockString } = require("../lib");
-const { OWNER_NAME, BOT_INFO } = require("../config");
-const { hostname } = require("os");
+const { Module, mode, runtime } = require("../lib");
+const { BOT_INFO, TIME_ZONE } = require("../config");
 
 Module(
 	{
@@ -21,16 +20,15 @@ Description: ${i.desc}\`\`\``);
 			}
 		} else {
 			let { prefix } = message;
-			let [date, time] = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }).split(",");
-			let menu = `╭━━━━━ᆫ ${BOT_INFO.split(",")[0]} ᄀ━━━
-┃ ⎆  *OWNER*:  ${OWNER_NAME}
-┃ ⎆  *PREFIX*: ${prefix}
-┃ ⎆  *HOST NAME*: ${hostname().split("-")[0]}
-┃ ⎆  *DATE*: ${date}
-┃ ⎆  *TIME*: ${time}
-┃ ⎆  *COMMANDS*: ${plugins.commands.length} 
-┃ ⎆  *UPTIME*: ${clockString(process.uptime())} 
-╰━━━━━━━━━━━━━━━\n`;
+			let [date, time] = new Date().toLocaleString("en-IN", { timeZone: TIME_ZONE }).split(",");
+			let menu = `╭─ ${BOT_INFO.split(",")[0]}  ───
+│ User: ${message.pushName}
+│ Prefix : ${prefix}
+│ Date: ${date}
+│ Time: ${time}
+│ Plugins: ${plugins.commands.length}
+│ Runtime: ${runtime(process.uptime())}
+╰────────────────\n`;
 			let cmnd = [];
 			let cmd;
 			let category = [];
@@ -49,17 +47,15 @@ Description: ${i.desc}\`\`\``);
 			});
 			cmnd.sort();
 			category.sort().forEach(cmmd => {
-				menu += `\n\t⦿---- *${cmmd.toUpperCase()}* ----⦿\n`;
+				menu += `\n╭── *${cmmd.toUpperCase()}*  ────\n`;
 				let comad = cmnd.filter(({ type }) => type == cmmd);
 				comad.forEach(({ cmd }) => {
-					menu += `\n⛥  _${cmd.trim()}_ `;
+					menu += `\n│ ${cmd.trim()}`;
 				});
-				menu += `\n`;
+				menu += `╰──────────────\n`;
 			});
-
-			menu += `\n`;
 			menu += `_🔖Send ${prefix}menu <command name> to get detailed information of a specific command._\n*📍Eg:* _${prefix}menu plugin_`;
-			return await message.sendMessage(message.jid, menu);
+			return await message.send(menu);
 		}
 	},
 );
