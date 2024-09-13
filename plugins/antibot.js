@@ -1,4 +1,4 @@
-const { Module, isPrivate } = require("../lib/");
+const { Module, mode } = require("../lib");
 const { parsedJid } = require("../lib/functions");
 const { banUser, unbanUser, isBanned } = require("../lib/db/ban");
 Module(
@@ -22,7 +22,7 @@ Module(
 		pattern: "banbot",
 		fromMe: true,
 		desc: "ban bot from a chat",
-		type: "",
+		type: "user",
 	},
 	async (message, match) => {
 		const chatid = message.jid;

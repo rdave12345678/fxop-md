@@ -1,15 +1,14 @@
 const plugins = require("../lib/plugins");
-const { Module, isPrivate, clockString } = require("../lib");
-const { OWNER_NAME, BOT_NAME } = require("../config");
+const { Module, mode, clockString } = require("../lib");
+const { OWNER_NAME, BOT_INFO } = require("../config");
 const { hostname } = require("os");
 
 Module(
 	{
 		pattern: "menu",
-		fromMe: isPrivate,
+		fromMe: mode,
 		desc: "Show All Commands",
 		dontAddCommandList: true,
-		type: "user",
 	},
 	async (message, match) => {
 		if (match) {
@@ -23,7 +22,7 @@ Description: ${i.desc}\`\`\``);
 		} else {
 			let { prefix } = message;
 			let [date, time] = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }).split(",");
-			let menu = `╭━━━━━ᆫ ${BOT_NAME} ᄀ━━━
+			let menu = `╭━━━━━ᆫ ${BOT_INFO.split(",")[0]} ᄀ━━━
 ┃ ⎆  *OWNER*:  ${OWNER_NAME}
 ┃ ⎆  *PREFIX*: ${prefix}
 ┃ ⎆  *HOST NAME*: ${hostname().split("-")[0]}
@@ -68,9 +67,8 @@ Description: ${i.desc}\`\`\``);
 Module(
 	{
 		pattern: "list",
-		fromMe: isPrivate,
+		fromMe: mode,
 		desc: "Show All Commands",
-		type: "user",
 		dontAddCommandList: true,
 	},
 	async (message, match, { prefix }) => {
