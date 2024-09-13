@@ -1,15 +1,14 @@
 {
-   "name": "FXOP_MD",
-   "dockerFile": "Dockerfile",
-   "customizations": {
-      "vscode": {
-         "extensions": ["ms-azuretools.vscode-docker"],
-         "settings": {
-            "terminal.integrated.defaultProfile.linux": "bash"
-         }
-      }
-   },
-   "forwardPorts": [3000],
-   "postCreateCommand": "npm install",
-   "remoteUser": "node"
+	"name": "fx-md",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": ["ms-azuretools.vscode-docker"]
+		}
+	},
+	"forwardPorts": [3000],
+	"postCreateCommand": "npm install",
+	"remoteUser": "node"
 }
