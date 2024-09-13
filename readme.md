@@ -14,14 +14,6 @@ A highly customizable WhatsApp bot built with the Baileys library, designed to b
 
 ---
 
-### Key Features
-
-- **Multi-platform deployment**: Easily deploy to platforms such as Heroku, Koyeb, Render, Railway, Termux, and more.
-- **Customizable**: Modify bot settings, including session information and bot details, via environment variables.
-- **Scalable**: Ideal for personal or large-scale usage with worker-based deployments.
-
----
-
 ### Deployment Options
 
 Deploy the project to your preferred platform with just a few clicks using the links below:
@@ -52,7 +44,7 @@ Deploy the project to your preferred platform with just a few clicks using the l
 
 ---
 
-### Running Locally
+### Running Locally? (Panel | Termux)
 
 If you prefer to run the bot on your local machine, follow these steps:
 
