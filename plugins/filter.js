@@ -1,5 +1,5 @@
-const { getFilter, setFilter, deleteFilter } = require("../database/filters");
-const { Module } = require("../../lib");
+const { getFilter, setFilter, deleteFilter } = require("../lib/db/filters");
+const { Module } = require("../lib");
 
 Module(
 	{

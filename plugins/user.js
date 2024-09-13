@@ -1,8 +1,8 @@
-const { Module, isAdmin, parsedJid } = require("../../lib");
+const { Module, isAdmin, parsedJid } = require("../lib");
 const { exec } = require("child_process");
-const { PausedChats, WarnDB } = require("../database");
-const { WARN_COUNT } = require("../../config");
-const { secondsToDHMS } = require("../../lib/functions");
+const { PausedChats, WarnDB } = require("../lib/db");
+const { WARN_COUNT } = require("../config");
+const { secondsToDHMS } = require("../lib/functions");
 const { saveWarn, resetWarn } = WarnDB;
 
 Module(

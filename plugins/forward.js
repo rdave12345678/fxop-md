@@ -1,4 +1,4 @@
-const { Module, parsedJid,isPrivate } = require("../../lib/");
+const { Module, parsedJid,isPrivate } = require("../lib/");
 
 Module(
   {

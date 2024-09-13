@@ -1,4 +1,4 @@
-const { Module, isPrivate } = require("../../lib");
+const { Module, isPrivate } = require("../lib");
 
 Module(
   {

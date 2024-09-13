@@ -1,6 +1,6 @@
-const { Module, isPrivate } = require("../../lib/");
-const { removeBg } = require("../../lib/functions");
-const config = require("../../config");
+const { Module, isPrivate } = require("../lib/");
+const { removeBg } = require("../lib/functions");
+const config = require("../config");
 Module(
   {
     pattern: "rmbg",

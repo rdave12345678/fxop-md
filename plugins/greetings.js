@@ -1,5 +1,5 @@
-const { Module } = require("../../lib");
-const { setMessage, getMessage, delMessage, getStatus, toggleStatus } = require("../database").Greetings;
+const { Module } = require("../lib");
+const { setMessage, getMessage, delMessage, getStatus, toggleStatus } = require("../lib/db").Greetings;
 
 Module(
 	{

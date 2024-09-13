@@ -1,6 +1,6 @@
-const config = require("../../config");
-const { Module, isPrivate, toAudio } = require("../../lib/");
-const { webp2mp4, textToImg } = require("../../lib/functions");
+const config = require("../config");
+const { Module, isPrivate, toAudio } = require("../lib/");
+const { webp2mp4, textToImg } = require("../lib/functions");
 Module(
   {
     pattern: "sticker",

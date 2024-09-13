@@ -1,6 +1,6 @@
-const { DELETED_LOG_CHAT, DELETED_LOG } = require("../../config");
-const { Module, isPrivate, serialize } = require("../../lib");
-const { loadMessage, getName } = require("../database/StoreDb");
+const { DELETED_LOG_CHAT, DELETED_LOG } = require("../config");
+const { Module, isPrivate, serialize } = require("../lib");
+const { loadMessage, getName } = require("../lib/db/StoreDb");
 Module(
   {
     on: "delete",

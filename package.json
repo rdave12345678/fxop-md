@@ -20,7 +20,7 @@
 		"file-type": "^16.5.3",
 		"fluent-ffmpeg": "^2.1.2",
 		"form-data": "^4.0.0",
-		"got": "^14.4.2",
+		"got": "^2.9.2",
 		"heroku-client": "^3.1.0",
 		"jimp": "^0.16.13",
 		"jsdom": "^22.1.0",

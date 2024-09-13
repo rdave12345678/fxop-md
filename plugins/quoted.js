@@ -1,5 +1,5 @@
-const { Module, isPrivate, serialize } = require("../../lib/");
-const { loadMessage } = require("../database/StoreDb");
+const { Module, isPrivate, serialize } = require("../lib/");
+const { loadMessage } = require("../lib/db/StoreDb");
 
 Module(
   {

@@ -1,5 +1,5 @@
-const { Module, isPrivate } = require("../../lib/");
-const { isAdmin, parsedJid } = require("../../lib");
+const { Module, isPrivate } = require("../lib/");
+const { isAdmin, parsedJid } = require("../lib");
 
 Module(
 	{
