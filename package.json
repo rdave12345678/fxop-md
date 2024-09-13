@@ -1,6 +1,6 @@
 {
 	"name": "fx-bot",
-	"version": "3.0.1",
+	"version": "v3.0.1",
 	"description": "Whatsapp Bot",
 	"main": "index.js",
 	"scripts": {
