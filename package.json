@@ -1,11 +1,11 @@
 {
-	"name": "fx-bot",
+	"name": "fx-md",
 	"version": "v3.0.1",
 	"description": "Whatsapp Bot",
 	"main": "index.js",
 	"scripts": {
-		"start": "pm2 start index.js --name fx-bot",
-		"stop": "pm2 stop fx-bot"
+		"start": "pm2 start . --attach --name fx-md",
+		"stop": "pm2 stop fx-md"
 	},
 	"author": "FXastro",
 	"dependencies": {
