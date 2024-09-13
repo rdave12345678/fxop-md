@@ -5,7 +5,7 @@ const { fetchPlugins } = require("./lib/db/plugins");
 
 async function initialize() {
 	try {
-		await patch();
+	//	await patch();
 		await modulesJS(path.join(__dirname, "/lib/db/"));
 		console.log("Syncing Database");
 		await config.DATABASE.sync();
