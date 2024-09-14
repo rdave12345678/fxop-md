@@ -7,7 +7,7 @@ Module(
 		desc: "Forwards The View once messsage",
 		type: "tool",
 	},
-	async (message, match, m) => {
+	async (message, match, conn, m) => {
 		let buff = await m.quoted.download();
 		return await message.sendFile(buff);
 	},
