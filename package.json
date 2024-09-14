@@ -12,6 +12,7 @@
 		"@adiwajshing/keyed-db": "*",
 		"axios": "*",
 		"baileys": "*",
+		"better-queue": "^3.8.12",
 		"bitly": "^4.1.1",
 		"browser-id3-writer": "^4.4.0",
 		"canvas": "2.11.2",
@@ -36,6 +37,7 @@
 		"sequelize": "^6.37.3",
 		"simple-git": "^3.24.0",
 		"sqlite3": "^5.1.7",
-		"stream-buffers": "^3.0.2"
+		"stream-buffers": "^3.0.2",
+		"uuid": "^10.0.0"
 	}
 }
