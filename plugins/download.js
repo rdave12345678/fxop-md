@@ -5,7 +5,7 @@ Module(
 	{
 		pattern: "video",
 		fromMe: mode,
-		desc: "Fetches Music",
+		desc: "Fetches Video",
 		type: "download",
 	},
 	async (message, match, client) => {
@@ -23,7 +23,7 @@ Module(
 
 Module(
 	{
-		pattern: "video",
+		pattern: "play",
 		fromMe: mode,
 		desc: "Fetches Music",
 		type: "download",
