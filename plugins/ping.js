@@ -1,15 +1,17 @@
 const { Module, mode } = require("../lib/");
+
 Module(
 	{
-		pattern: "ping",
+		pattern: "ping ?(.*)",
 		fromMe: mode,
-		desc: "To check ping",
-		type: "misc",
+		desc: "Bot response in milliseconds.",
+		type: "system",
 	},
-	async (message, match) => {
+	async message => {
 		const start = new Date().getTime();
-		await message.sendMessage(message.jid, "```Ping!```");
+		const msg = await message.reply("Checking");
 		const end = new Date().getTime();
-		return await message.sendMessage(message.jid, "*Pong!*\n ```" + (end - start) + "``` *ms*");
+		const responseTime = (end - start) / 1000;
+		await msg.edit(`\`\`\`Responce Rate ${responseTime} secs\`\`\``);
 	},
 );
