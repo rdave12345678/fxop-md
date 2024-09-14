@@ -21,7 +21,7 @@ Description: ${plugin.description}\`\`\``);
 		} else {
 			const { prefix } = message;
 			const [currentDate, currentTime] = new Date().toLocaleString("en-IN", { timeZone: TIME_ZONE }).split(",");
-			let menuText = `\`\`\`╭─ ${BOT_INFO.split(",")[0]}  ───
+			let menuText = `\`\`\`╭─ ${BOT_INFO.split(";")[0]}  ───
 │ User: ${message.pushName}
 │ Prefix: ${prefix}
 │ Date: ${currentDate}
@@ -49,12 +49,12 @@ Description: ${plugin.description}\`\`\``);
 
 			commands.sort((a, b) => a.name.localeCompare(b.name));
 			categories.sort().forEach(category => {
-				menuText += `\n╭── *${category.toUpperCase()}*  ────`;
+				menuText += `\n\`\`\`╭── ${category.toUpperCase()} ────`;
 				const categoryCommands = commands.filter(cmd => cmd.category === category);
 				categoryCommands.forEach(({ name }) => {
 					menuText += `\n│ ${name.trim()}`;
 				});
-				menuText += `\n╰──────────────\n`;
+				menuText += `\n╰──────────────\`\`\`\n`;
 			});
 
 			menuText += `_🔖Send ${prefix}menu <command name> to get detailed information of a specific command._\n*📍Eg:* _${prefix}menu plugin_`;
