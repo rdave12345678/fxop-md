@@ -1,4 +1,4 @@
-const plugins = require("../lib/plugins");
+const pluginManager = require("../lib/plugins");
 const { Module, mode, runtime } = require("../lib");
 const { BOT_INFO, TIME_ZONE } = require("../config");
 
@@ -6,56 +6,59 @@ Module(
 	{
 		pattern: "menu",
 		fromMe: mode,
-		desc: "Show All Commands",
+		description: "Show All Commands",
 		dontAddCommandList: true,
 	},
-	async (message, match) => {
-		if (match) {
-			for (let i of plugins.commands) {
-				if (i.pattern instanceof RegExp && i.pattern.test(message.prefix + match)) {
-					const cmdName = i.pattern.toString().split(/\W+/)[1];
-					message.reply(`\`\`\`Command: ${message.prefix}${cmdName.trim()}
-Description: ${i.desc}\`\`\``);
+	async (message, query) => {
+		if (query) {
+			for (const plugin of pluginManager.commands) {
+				if (plugin.pattern instanceof RegExp && plugin.pattern.test(message.prefix + query)) {
+					const commandName = plugin.pattern.toString().split(/\W+/)[1];
+					message.reply(`\`\`\`Command: ${message.prefix}${commandName.trim()}
+Description: ${plugin.description}\`\`\``);
 				}
 			}
 		} else {
-			let { prefix } = message;
-			let [date, time] = new Date().toLocaleString("en-IN", { timeZone: TIME_ZONE }).split(",");
-			let menu = `╭─ ${BOT_INFO.split(",")[0]}  ───
+			const { prefix } = message;
+			const [currentDate, currentTime] = new Date().toLocaleString("en-IN", { timeZone: TIME_ZONE }).split(",");
+			let menuText = `\`\`\`╭─ ${BOT_INFO.split(",")[0]}  ───
 │ User: ${message.pushName}
-│ Prefix : ${prefix}
-│ Date: ${date}
-│ Time: ${time}
-│ Plugins: ${plugins.commands.length}
+│ Prefix: ${prefix}
+│ Date: ${currentDate}
+│ Time: ${currentTime}
+│ Plugins: ${pluginManager.commands.length}
 │ Runtime: ${runtime(process.uptime())}
-╰────────────────\n`;
-			let cmnd = [];
-			let cmd;
-			let category = [];
-			plugins.commands.map((command, num) => {
+╰────────────────\`\`\`\n`;
+			const commands = [];
+			const categories = [];
+
+			pluginManager.commands.forEach(command => {
 				if (command.pattern instanceof RegExp) {
-					cmd = command.pattern.toString().split(/\W+/)[1];
-				}
+					const commandName = command.pattern.toString().split(/\W+/)[1];
 
-				if (!command.dontAddCommandList && cmd !== undefined) {
-					let type = command.type ? command.type.toLowerCase() : "misc";
+					if (!command.dontAddCommandList && commandName !== undefined) {
+						const category = command.type ? command.type.toLowerCase() : "misc";
+						commands.push({ name: commandName, category });
 
-					cmnd.push({ cmd, type });
-
-					if (!category.includes(type)) category.push(type);
+						if (!categories.includes(category)) {
+							categories.push(category);
+						}
+					}
 				}
 			});
-			cmnd.sort();
-			category.sort().forEach(cmmd => {
-				menu += `\n╭── *${cmmd.toUpperCase()}*  ────\n`;
-				let comad = cmnd.filter(({ type }) => type == cmmd);
-				comad.forEach(({ cmd }) => {
-					menu += `\n│ ${cmd.trim()}`;
+
+			commands.sort((a, b) => a.name.localeCompare(b.name));
+			categories.sort().forEach(category => {
+				menuText += `\n╭── *${category.toUpperCase()}*  ────`;
+				const categoryCommands = commands.filter(cmd => cmd.category === category);
+				categoryCommands.forEach(({ name }) => {
+					menuText += `\n│ ${name.trim()}`;
 				});
-				menu += `╰──────────────\n`;
+				menuText += `\n╰──────────────\n`;
 			});
-			menu += `_🔖Send ${prefix}menu <command name> to get detailed information of a specific command._\n*📍Eg:* _${prefix}menu plugin_`;
-			return await message.send(menu);
+
+			menuText += `_🔖Send ${prefix}menu <command name> to get detailed information of a specific command._\n*📍Eg:* _${prefix}menu plugin_`;
+			return await message.send(menuText);
 		}
 	},
 );
@@ -64,30 +67,32 @@ Module(
 	{
 		pattern: "list",
 		fromMe: mode,
-		desc: "Show All Commands",
+		description: "Show All Commands",
 		dontAddCommandList: true,
 	},
-	async (message, match, { prefix }) => {
-		let menu = "\t\t```Command List```\n";
+	async (message, query, { prefix }) => {
+		let commandListText = "\t\t```Command List```\n";
+		const commands = [];
 
-		let cmnd = [];
-		let cmd, desc;
-		plugins.commands.map(command => {
+		pluginManager.commands.forEach(command => {
 			if (command.pattern) {
-				cmd = command.pattern.toString().split(/\W+/)[1];
-			}
-			desc = command.desc || false;
+				const commandName = command.pattern.toString().split(/\W+/)[1];
+				const description = command.description || false;
 
-			if (!command.dontAddCommandList && cmd !== undefined) {
-				cmnd.push({ cmd, desc });
+				if (!command.dontAddCommandList && commandName !== undefined) {
+					commands.push({ name: commandName, description });
+				}
 			}
 		});
-		cmnd.sort();
-		cmnd.forEach(({ cmd, desc }, num) => {
-			menu += `\`\`\`${(num += 1)} ${cmd.trim()}\`\`\`\n`;
-			if (desc) menu += `Use: \`\`\`${desc}\`\`\`\n\n`;
+
+		commands.sort((a, b) => a.name.localeCompare(b.name));
+		commands.forEach(({ name, description }, index) => {
+			commandListText += `\`\`\`${index + 1} ${name.trim()}\`\`\`\n`;
+			if (description) {
+				commandListText += `Use: \`\`\`${description}\`\`\`\n\n`;
+			}
 		});
-		menu += ``;
-		return await message.reply(menu);
+
+		return await message.send(commandListText);
 	},
 );
