@@ -4,7 +4,7 @@ Module(
 		pattern: "ping",
 		fromMe: mode,
 		desc: "To check ping",
-		type: "user",
+		type: "misc",
 	},
 	async (message, match) => {
 		const start = new Date().getTime();

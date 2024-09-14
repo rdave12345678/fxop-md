@@ -1,5 +1,6 @@
 const config = require("../config");
-const { Module, mode, toAudio, webp2mp4, textToImg } = require("../lib/");
+const { Module, mode, toAudio, webp2mp4 } = require("../lib/");
+
 Module(
 	{
 		pattern: "sticker",
@@ -10,12 +11,7 @@ Module(
 	async (message, match, m) => {
 		if (!message.reply_message && (!message.reply_message.video || !message.reply_message.sticker || !message.reply_message.text)) return await message.reply("_Reply to photo/video/text_");
 		var buff;
-		if (message.reply_message.text) {
-			buff = await textToImg(message.reply_message.text);
-		} else {
-			buff = await m.quoted.download();
-		}
-
+		buff = await m.quoted.download();
 		message.sendMessage(message.jid, buff, { packname: config.PACKNAME, author: config.AUTHOR }, "sticker");
 	},
 );
@@ -29,8 +25,8 @@ Module(
 	},
 	async (message, match, m) => {
 		if (!message.reply_message.sticker) return await message.reply("_Reply to a sticker_");
-		const packname = match.split(";")[0] || config.PACKNAME;
-		const author = match.split(";")[1] || config.AUTHOR;
+		const packname = config.STICKER_PACK.split(";")[0];
+		const author = config.STICKER_PACK.split(";")[1];
 		let buff = await m.quoted.download();
 		message.sendMessage(message.jid, buff, { packname, author }, "sticker");
 	},

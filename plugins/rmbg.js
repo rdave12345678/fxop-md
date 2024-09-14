@@ -5,7 +5,7 @@ Module(
 		pattern: "rmbg",
 		fromMe: mode,
 		desc: "Remove background of an image",
-		type: "image",
+		type: "misc",
 	},
 	async (message, match, m) => {
 		if (!config.REMOVEBG) return await message.sendMessage(message.jid, "Set RemoveBg API Key in config.js \n Get it from https://www.remove.bg/api");
