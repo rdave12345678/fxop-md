@@ -15,7 +15,6 @@
     "better-queue": "^3.8.12",
     "bitly": "^4.1.1",
     "browser-id3-writer": "^4.4.0",
-    "canvas": "2.11.2",
     "cheerio": "^1.0.0-rc.12",
     "client": "github:FXastro/client-bot",
     "dotenv": "^16.4.5",
