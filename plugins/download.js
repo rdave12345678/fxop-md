@@ -1,4 +1,4 @@
-const { Module, mode, toAudio } = require("../lib");
+const { Module, mode, toAudio, toPTT } = require("../lib");
 const { ytPlay } = require("client");
 
 Module(
@@ -35,7 +35,7 @@ Module(
 			details: { title, description },
 			video,
 		} = await ytPlay(match);
-		const audio = await toAudio(video, "mp3");
+		const audio = await toPTT(video, "mp3");
 		await message.send(audio, { caption: `\`\`\`${description}\`\`\``, contextInfo: { forwardingScore: 999, isForwarded: true, forwardedNewsletterMessageInfo: { newsletterJid: "120363327841612745@newsletter", newsletterName: title } } });
 		return smsg.edit(`*_Downloaded Successfully_*`);
 	},
