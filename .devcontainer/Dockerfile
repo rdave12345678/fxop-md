@@ -5,11 +5,12 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get install -y --no-install-recommends \
-       ffmpeg \
-       chromium \
-       libatk-bridge2.0-0 \
-       libgtk-3-0 \
-       libasound2 \
-       libgbm1 \
+    ffmpeg \
+    chromium \
+    libatk-bridge2.0-0 \
+    libgtk-3-0 \
+    libasound2 \
+    libgbm1 \
+    git \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
