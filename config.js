@@ -35,6 +35,7 @@ module.exports = {
 			  }),
 	BRANCH: "master",
 	WARN_COUNT: 3,
+	RMBG_API_KEY: process.env.RMBG_API_KEY || "",
 	DELETED_LOG: toBool(process.env.DELETED_LOG) || false,
 	DELETED_LOG_CHAT: toBool(process.env.DELETED_LOG_CHAT) || false,
 	TIME_ZONE: process.env.TZ,
