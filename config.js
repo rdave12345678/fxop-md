@@ -6,7 +6,7 @@ module.exports = {
 	SESSION_ID: (process.env.SESSION_ID || "").trim(),
 	BOT_INFO: process.env.BOT_NAME || "Astro;FxBot",
 	SUDO: process.env.SUDO || "912345678909",
-	HANDLERS: process.env.HANDLER === "false" || process.env.HANDLER === "null" ? "^" : ".",
+	HANDLERS: process.env.HANDLER === "false" || process.env.HANDLER === "null" ? "^" : "[.]",
 	WELCOME_MSG: process.env.WELCOME_MSG || "Hi @user Welcome to @gname",
 	GOODBYE_MSG: process.env.GOODBYE_MSG || "Hi @user It was Nice Seeing you",
 	STATUS_SAVER: toBool(process.env.STATUS_SAVER) || true,

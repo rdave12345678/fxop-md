@@ -1,4 +1,4 @@
-const { Module, parsedJid, mode } = require("../lib/");
+const { Module, parsedJid, mode } = require("../lib");
 
 Module(
 	{
