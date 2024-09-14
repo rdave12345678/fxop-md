@@ -1,25 +1,36 @@
-const { Module, mode, getBuffer, toAudio, toPTT } = require("../lib");
+const { Module, mode } = require("../lib");
 const { ytPlay } = require("client");
 
 Module(
 	{
-		pattern: "play",
+		pattern: "video",
 		fromMe: mode,
 		desc: "Fetches Music",
 		type: "download",
 	},
 	async (message, match, client) => {
 		if (!match) {
-			return await message.sendReply(`\t\`\`\`Wrong Usage\n\n${message.prefix}play Just the two of us\n\nOR\n\n${message.prefix}play YTMusic URL\`\`\``);
+			return message.sendReply(`\`\`\`Wrong Usage\n\n${message.prefix}video Just the two of us\n\nOR\n\n${message.prefix}video YOUTUBE URL\`\`\``);
 		}
+
 		const smsg = await message.reply("*_Searching_*");
-		const audioDl = await ytPlay(match);
-		const title = audioDl.details.title;
-		const description = audioDl.details.description;
-		const audio = audioDl.video;
-		const audioInfoMsg = `\`\`\`${title}\n${description}\`\`\``;
-		await smsg.edit(audioInfoMsg);
-		const audioFile = await toAudio(audio, "mp3");
-		return await message.sendFile(audioFile);
+		const {
+			details: { title, description },
+			video,
+		} = await ytPlay(match);
+
+		await message.send(video, {
+			caption: `\`\`\`${description}\`\`\``,
+			contextInfo: {
+				forwardingScore: 999,
+				isForwarded: true,
+				forwardedNewsletterMessageInfo: {
+					newsletterJid: "120363327841612745@newsletter",
+					newsletterName: title,
+				},
+			},
+		});
+
+		return smsg.edit(`*_Downloaded Successfully_*`);
 	},
 );
