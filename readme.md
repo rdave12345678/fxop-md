@@ -1,16 +1,12 @@
 ## Simple WhatsApp Bot
 
 <p align="center">
-  <strong>Simple WhatsApp Bot</strong>
-</p>
-
-<p align="center">
   <a href="https://fx-session.vercel.app/">
     <img src="https://img.shields.io/badge/Get%20Session%20ID-000?style=for-the-badge&logo=server&logoColor=white" alt="Get Session ID"/>
   </a>
 </p>
 
-A highly customizable WhatsApp bot built with the Baileys library, designed to be easily deployable to multiple platforms with minimal configuration. You can set up and run the bot locally or deploy it to various cloud services.
+A very Simple WhatsApp bot built with the Baileys library, designed to be easily deployable to multiple platforms with minimal configuration. You can set up and run the bot locally or deploy it to various cloud services.
 
 ---
 
