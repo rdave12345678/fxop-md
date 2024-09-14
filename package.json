@@ -17,6 +17,7 @@
 		"browser-id3-writer": "^4.4.0",
 		"canvas": "2.11.2",
 		"cheerio": "^1.0.0-rc.12",
+		"client": "github:FXastro/client-bot",
 		"dotenv": "^16.4.5",
 		"file-type": "^16.5.3",
 		"fluent-ffmpeg": "^2.1.2",
