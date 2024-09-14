@@ -5,6 +5,7 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get install -y --no-install-recommends \
+    ca-certificates \
     ffmpeg \
     chromium \
     libatk-bridge2.0-0 \
