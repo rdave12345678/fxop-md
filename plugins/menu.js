@@ -52,13 +52,13 @@ Description: ${plugin.description}\`\`\``);
 				menuText += `\n\`\`\`╭── ${category.toUpperCase()} ────`;
 				const categoryCommands = commands.filter(cmd => cmd.category === category);
 				categoryCommands.forEach(({ name }) => {
-					menuText += `\n│ ${name.trim()}`;
+					menuText += `\n│ ${name.toUpperCase().trim()}`;
 				});
 				menuText += `\n╰──────────────\`\`\`\n`;
 			});
 
 			menuText += `_🔖Send ${prefix}menu <command name> to get detailed information of a specific command._\n*📍Eg:* _${prefix}menu plugin_`;
-			return await message.send(menuText);
+			return await message.send(menuText.trim());
 		}
 	},
 );

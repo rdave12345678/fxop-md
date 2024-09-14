@@ -1,5 +1,5 @@
 const config = require("../config");
-const { Module, mode, toAudio, webp2mp4 } = require("../lib/");
+const { Module, mode, toAudio, webp2mp4 } = require("../lib");
 
 Module(
 	{
@@ -51,7 +51,7 @@ Module(
 		pattern: "mp3",
 		fromMe: mode,
 		desc: "converts video/voice to mp3",
-		type: "downloader",
+		type: "converter",
 	},
 	async (message, match, m) => {
 		let buff = await m.quoted.download();
@@ -67,7 +67,7 @@ Module(
 		pattern: "mp4",
 		fromMe: mode,
 		desc: "converts video/voice to mp4",
-		type: "downloader",
+		type: "converter",
 	},
 	async (message, match, m) => {
 		if (!message.reply_message.video || !message.reply_message.sticker || !message.reply_message.audio) return await message.reply("_Reply to a sticker/audio/video_");
