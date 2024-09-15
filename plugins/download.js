@@ -1,20 +1,34 @@
-const { Module, mode, toAudio, toPTT, twitter } = require("../lib");
+const { Module, mode, toPTT, twitter, getJson, IronMan, getBuffer } = require("../lib");
 const { ytPlay } = require("client");
+
+Module(
+	{
+		pattern: "spotify ?(.*)",
+		fromMe: mode,
+		desc: "Downloads song from Spotify",
+		type: "download",
+	},
+	async (message, match) => {
+		if (!match || !match.includes("https://open.spotify.com")) return await message.reply("_Need a valid Spotify URL_");
+		const { link } = await getJson(IronMan(`ironman/dl/spotify?link=${match}`));
+		const buff = await toPTT(await getBuffer(link));
+		await message.send(buff);
+	},
+);
 
 Module(
 	{
 		pattern: "twitter",
 		fromMe: mode,
-		desc: "download twitter media",
+		desc: "Download Twitter media",
 		type: "download",
 	},
-	async (message, match, client) => {
-		if (!match) return await message.sendReply("```Wrong format\n\n" + message.prefix + "twitter URL```");
-		if (!isUrl(match)) return await message.reply("_Invaild Twitter Url_");
+	async (message, match) => {
+		if (!match || !match.includes("https://x.com")) return await message.reply("_Invalid Twitter URL_");
 		const msg = await message.reply("*_Downloading_*");
 		const buff = await twitter(match);
 		await msg.edit("*_Download Success_*");
-		return await message.send(buff);
+		await message.send(buff);
 	},
 );
 
@@ -25,12 +39,12 @@ Module(
 		desc: "Fetches Video",
 		type: "download",
 	},
-	async (message, match, client) => {
+	async (message, match) => {
 		if (!match[1]) return message.sendReply(`\`\`\`Wrong Usage\n\n${message.prefix}video Just the two of us\`\`\``);
 		const msg = await message.reply("*_Searching_*");
 		const { video } = await ytPlay(match);
-		await msg.edit(`*_Downloaded Success_*`);
-		return await message.send(video);
+		await msg.edit(`*_Download Success_*`);
+		await message.send(video);
 	},
 );
 
@@ -41,12 +55,12 @@ Module(
 		desc: "Fetches Music",
 		type: "download",
 	},
-	async (message, match, client) => {
+	async (message, match) => {
 		if (!match[1]) return message.sendReply(`\`\`\`Wrong Usage\n\n${message.prefix}play StarMan\`\`\``);
 		const msg = await message.reply("*_Downloading_*");
 		const { video } = await ytPlay(match);
 		const audio = await toPTT(video, "mp3");
-		await msg.edit(`*_Downloaded Successfully_*`);
-		return await message.send(audio);
+		await msg.edit(`*_Download Successful_*`);
+		await message.send(audio);
 	},
 );
