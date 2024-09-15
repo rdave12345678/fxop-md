@@ -1,7 +1,7 @@
 const { Module, parsedJid, isAdmin } = require("../lib/");
 const { banUser, unbanUser, isBanned } = require("../lib/db/ban");
 const moment = require("moment");
-
+const { scheduleGroupMuteUnmute } = require("../lib/client");
 Module(
 	{
 		on: "message",
@@ -610,8 +610,6 @@ Module(
 	},
 );
 
-const muteSchedules = {};
-
 Module(
 	{
 		pattern: "automute ?(.*)",
@@ -635,11 +633,7 @@ Module(
 		if (muteTime.isBefore(moment())) {
 			muteTime.add(1, "day");
 		}
-
-		muteSchedules[message.jid] = {
-			mute: muteTime.toDate(),
-			unmute: muteSchedules[message.jid]?.unmute || null,
-		};
+		scheduleGroupMuteUnmute(message.jid, muteTime, null, client);
 
 		await message.reply(`_Group will be muted at ${muteTime.format("HH:mm")} daily_`);
 	},
@@ -668,44 +662,8 @@ Module(
 		if (unmuteTime.isBefore(moment())) {
 			unmuteTime.add(1, "day");
 		}
-
-		muteSchedules[message.jid] = {
-			mute: muteSchedules[message.jid]?.mute || null,
-			unmute: unmuteTime.toDate(),
-		};
+		scheduleGroupMuteUnmute(message.jid, null, unmuteTime, client);
 
 		await message.reply(`_Group will be unmuted at ${unmuteTime.format("HH:mm")} daily_`);
-	},
-);
-
-Module(
-	{
-		on: "message",
-	},
-	async (message, match, m, client) => {
-		if (!message.isGroup) return;
-
-		const now = new Date();
-		const schedule = muteSchedules[message.jid];
-
-		if (schedule) {
-			if (schedule.mute && moment(now).format("HH:mm") === moment(schedule.mute).format("HH:mm")) {
-				try {
-					await client.groupSettingUpdate(message.jid, "announcement");
-					await client.sendMessage(message.jid, { text: "_Group has been muted_" });
-				} catch (error) {
-					console.error("Error muting group:", error);
-				}
-			}
-
-			if (schedule.unmute && moment(now).format("HH:mm") === moment(schedule.unmute).format("HH:mm")) {
-				try {
-					await client.groupSettingUpdate(message.jid, "not_announcement");
-					await client.sendMessage(message.jid, { text: "_Group has been unmuted_" });
-				} catch (error) {
-					console.error("Error unmuting group:", error);
-				}
-			}
-		}
 	},
 );
