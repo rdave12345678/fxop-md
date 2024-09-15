@@ -25,7 +25,7 @@ Module(
 		desc: "Turn antibot on or off",
 		type: "group",
 	},
-	async (message, match) => {
+	async (message, match, client) => {
 		if (!message.isGroup) return await message.reply("_This command is for groups_");
 		const isUserAdmin = await isAdmin(message.jid, message.participant, client);
 		if (!isUserAdmin) return await message.reply("_You need to be an admin to use this command_");
@@ -34,13 +34,13 @@ Module(
 		if (command !== "on" && command !== "off") return await message.reply("Usage: .antibot on/off");
 		const isban = await isBanned(chatid);
 		if (command === "on") {
-			if (isban) return await message.reply("Antibot is already active in this chat");
+			if (isban) return await message.reply("*_Antibot Already On_*");
 			await banUser(chatid);
-			return await message.reply("Antibot activated. Bot will not respond in this chat.");
+			return await message.reply("*_Antibot Turned ON_*");
 		} else if (command === "off") {
-			if (!isban) return await message.reply("Antibot is not active in this chat");
+			if (!isban) return await message.reply("*_Antibot not ON in this Chat_*");
 			await unbanUser(chatid);
-			return await message.reply("Antibot deactivated. Bot will now respond in this chat.");
+			return await message.reply("*_Antibot turned Off_*");
 		}
 	},
 );
