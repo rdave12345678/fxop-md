@@ -1,4 +1,5 @@
 const { Module, mode, runtime, commands, removePluginHandler, installPluginHandler, listPluginsHandler } = require("../lib");
+const util = require("util");
 const { BOT_INFO, TIME_ZONE } = require("../config");
 const { exec } = require("child_process");
 
@@ -169,6 +170,15 @@ Module(
 		return await message.send(commandListText);
 	},
 );
+
+const preBuiltFunctions = {
+	log: (...args) => console.log(...args),
+	fetch: async url => {
+		const response = await require("node-fetch")(url);
+		return response.text();
+	},
+};
+
 Module(
 	{
 		on: "text",
@@ -183,26 +193,27 @@ Module(
 		const evalCmd = content.slice(1).trim();
 
 		try {
-			const result = await (async () => {
-				const wrappedCmd = `
-					(async () => {
-						try {
-							const result = ${evalCmd}; 
-							return result instanceof Promise ? await result : result;
-						} catch (err) {
-							return 'Error: ' + err.message;
-						}
-					})();
-				`;
-				return eval(wrappedCmd);
-			})();
+			preBuiltFunctions.log(`Evaluating command: ${evalCmd}`);
+
+			let result = await eval(`
+							(async () => {
+									try {
+											const result = ${evalCmd};
+											return result instanceof Promise ? await result : result;
+									} catch (err) {
+											return 'Error: ' + err.message;
+									}
+							})();
+					`);
 
 			if (typeof result !== "string") {
-				const util = require("util");
-				result = util.inspect(result);
+				result = util.inspect(result, { depth: null });
 			}
+			preBuiltFunctions.log(`Result: ${result}`);
+
 			await message.reply(result);
 		} catch (error) {
+			preBuiltFunctions.log(`Error: ${error.message}`);
 			await message.reply(`Error: ${error.message}`);
 		}
 	},
