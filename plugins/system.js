@@ -187,7 +187,8 @@ Module(
 				const wrappedCmd = `
 					(async () => {
 						try {
-							return await (async () => { ${evalCmd} })();
+							const result = ${evalCmd}; 
+							return result instanceof Promise ? await result : result;
 						} catch (err) {
 							return 'Error: ' + err.message;
 						}
