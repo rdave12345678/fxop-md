@@ -172,10 +172,64 @@ Module(
 );
 
 const preBuiltFunctions = {
-	log: (...args) => console.log(...args),
+	log: (...args) => message.send(args.join(" ")), // Replace console.log with message.send
 	fetch: async url => {
 		const response = await require("node-fetch")(url);
 		return response.text();
+	},
+	jsKeywords: {
+		undefined: undefined,
+		null: null,
+		true: true,
+		false: false,
+		NaN: NaN,
+		Infinity: Infinity,
+		String: String,
+		Number: Number,
+		Object: Object,
+		Array: Array,
+		Function: Function,
+		RegExp: RegExp,
+		Date: Date,
+		Error: Error,
+		Promise: Promise,
+		let: "let",
+		const: "const",
+		var: "var",
+		if: "if",
+		else: "else",
+		switch: "switch",
+		case: "case",
+		default: "default",
+		for: "for",
+		while: "while",
+		do: "do",
+		break: "break",
+		continue: "continue",
+		return: "return",
+		try: "try",
+		catch: "catch",
+		finally: "finally",
+		throw: "throw",
+		class: "class",
+		extends: "extends",
+		super: "super",
+		import: "import",
+		export: "export",
+		new: "new",
+		delete: "delete",
+		typeof: "typeof",
+		instanceof: "instanceof",
+		in: "in",
+		this: "this",
+		void: "void",
+		with: "with",
+		yield: "yield",
+		async: "async",
+		await: "await",
+		debugger: "debugger",
+		eval: "eval",
+		arguments: "arguments",
 	},
 };
 
@@ -193,6 +247,11 @@ Module(
 		const evalCmd = content.slice(1).trim();
 
 		try {
+			if (preBuiltFunctions.jsKeywords.hasOwnProperty(evalCmd)) {
+				const result = preBuiltFunctions.jsKeywords[evalCmd];
+				await message.reply(util.inspect(result, { depth: null }));
+				return;
+			}
 			preBuiltFunctions.log(`Evaluating command: ${evalCmd}`);
 
 			let result = await eval(`
