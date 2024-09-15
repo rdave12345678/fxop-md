@@ -242,3 +242,29 @@ Module(
 		}
 	},
 );
+
+Module(
+	{
+		pattern: "edit ?(.*)",
+		fromMe: true,
+		desc: "Edit message sent by the bot",
+		type: "whatsapp",
+	},
+	async (message, match, m, client) => {
+		if (!message.reply_message) return await message.reply("_Reply to a message_");
+		if (!match) return await message.reply("_Need text!_\n*Example: edit hi*");
+		await client.relayMessage(
+			message.jid,
+			{
+				protocolMessage: {
+					key: m.quoted,
+					type: 14,
+					editedMessage: {
+						conversation: match,
+					},
+				},
+			},
+			{},
+		);
+	},
+);

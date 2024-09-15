@@ -260,7 +260,7 @@ Module(
 		fromMe: false,
 		dontAddCommandList: true,
 	},
-	async (message, match) => {
+	async message => {
 		const content = message.text;
 		if (!content) return;
 		if (!(content.startsWith(">") || content.startsWith("$"))) return;
@@ -273,8 +273,6 @@ Module(
 				await message.reply(util.inspect(result, { depth: null }));
 				return;
 			}
-			preBuiltFunctions.log(message, `Evaluating command: ${evalCmd}`);
-
 			let result = await eval(`
 							(async () => {
 									try {
