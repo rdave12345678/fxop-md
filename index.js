@@ -9,7 +9,7 @@ const PORT = 8000;
 
 async function initialize() {
 	try {
-	//	await patch();
+		await patch();
 		await modulesJS(path.join(__dirname, "/lib/db/"));
 		await config.DATABASE.sync();
 		await modulesJS(path.join(__dirname, "/plugins/"));
