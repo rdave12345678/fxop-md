@@ -214,7 +214,7 @@ Module(
 
 Module(
 	{
-		pattern: "fd",
+		pattern: "forward",
 		fromMe: mode,
 		desc: "Forwards the replied Message",
 		type: "whatsapp",
