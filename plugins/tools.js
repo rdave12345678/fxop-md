@@ -1,4 +1,4 @@
-const { Module, mode, qrcode, isUrl, Bitly, removeBg } = require("../lib");
+const { Module, mode, qrcode, isUrl, Bitly, removeBg, tinyurl, ssweb, shortenurl } = require("../lib");
 const config = require("../config");
 Module(
 	{
@@ -48,9 +48,28 @@ Module(
 	async (message, match, m) => {
 		if (!config.RMBG_API_KEY) return await message.sendReply("_API key not Set!_");
 		if (!message.reply_message?.image) return await message.reply("Reply to an image");
+		const msg = await message.reply("_Processing Image!_");
 		const buff = await m.quoted.download();
 		const buffer = await removeBg(buff);
-		if (!buffer) return await message.reply("An error occurred");
+		await msg.edit("*_Opration Success_*");
 		await message.send(buffer);
+	},
+);
+
+Module(
+	{
+		pattern: "tinyurl",
+		fromMe: mode,
+		desc: "Shortens Link with TinyURL",
+		type: "tools",
+	},
+	async (message, match, m) => {
+		match = match || message.reply_message.text;
+		if (!match) return await message.sendReply("```Wrong format\n\n" + message.prefix + "tinyurl URL\n\nOR REPLY A MESSAGE```");
+		if (!isUrl(match)) return await message.sendReply("_Invaild Url_");
+		const msg = await message.reply("_Shorting Link_");
+		const shorten_text = await tinyurl(match);
+		await msg.edit("*_Opreation Success_*");
+		return await message.send(shorten_text);
 	},
 );
