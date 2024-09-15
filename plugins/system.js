@@ -287,25 +287,22 @@ Module(
 
 		try {
 			const { jsKeywords, ...functions } = preBuiltFunctions;
-			const context = { ...jsKeywords, ...functions };
-
+			const context = { ...jsKeywords, ...functions, message, require };
 			let result = await eval(`
 				(async () => {
 					with (context) {
 						try {
-							const result = ${evalCmd};
-							return result instanceof Promise ? await result : result;
+							${evalCmd} 
 						} catch (err) {
 							return 'Error: ' + err.message;
 						}
 					}
 				})();
 			`);
-
 			if (typeof result !== "string") {
 				result = util.inspect(result, { depth: null });
 			}
-			preBuiltFunctions.log(message, `\t*System Excution*\n\n\n \`\`\`${result}\`\`\``);
+			preBuiltFunctions.log(message, `Result: ${result}`);
 		} catch (error) {
 			preBuiltFunctions.log(message, `Error: ${error.message}`);
 			await message.reply(`Error: ${error.message}`);

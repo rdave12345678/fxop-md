@@ -1,5 +1,5 @@
 const config = require("../config");
-const { Module, mode, toAudio, webp2mp4 } = require("../lib");
+const { Module, mode, toAudio, webp2mp4, fancy } = require("../lib");
 
 Module(
 	{
@@ -92,5 +92,19 @@ Module(
 		if (!message.reply_message.sticker) return await message.reply("_Reply to a sticker_");
 		let buff = await m.quoted.download();
 		return await message.send(buff);
+	},
+);
+
+Module(
+	{
+		pattern: "fancy",
+		fromMe: mode,
+		desc: "Converts Normal text to Fancy Rubbish",
+		type: "converter",
+	},
+	async (message, match, m, client) => {
+		if (!match) return await message.sendReply("```Wrong format!\n\n" + message.prefix + "fancy Astro```");
+		const fancy_text = await fancy(match);
+		return await message.send(fancy_text);
 	},
 );
