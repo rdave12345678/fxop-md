@@ -11,7 +11,7 @@ Module(
 	async (message, match, m) => {
 		if (!message.reply_message && (!message.reply_message.video || !message.reply_message.sticker || !message.reply_message.text)) return await message.reply("_Reply to photo/video/text_");
 		var buff;
-		buff = await m.quoted.download();
+		buff = await m.quoted[1].download();
 		message.sendMessage(message.jid, buff, { packname: config.PACKNAME, author: config.AUTHOR }, "sticker");
 	},
 );
