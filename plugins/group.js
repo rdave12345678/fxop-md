@@ -1,5 +1,48 @@
 const { Module, parsedJid, isAdmin } = require("../lib/");
+const { banUser, unbanUser, isBanned } = require("../lib/db/ban");
 const moment = require("moment");
+
+Module(
+	{
+		on: "message",
+		fromMe: true,
+		dontAddCommandList: true,
+	},
+	async (message, match) => {
+		if (!message.isBaileys) return;
+		const isban = await isBanned(message.jid);
+		if (!isban) return;
+		await message.reply("_Bot is banned in this chat_");
+		const jid = parsedJid(message.participant);
+		return await message.client.groupParticipantsUpdate(message.jid, jid, "remove");
+	},
+);
+
+Module(
+	{
+		pattern: "antibot ?(.*)",
+		fromMe: true,
+		desc: "Turn antibot on or off",
+		type: "group",
+	},
+	async (message, match, m, client) => {
+		if (!message.isGroup) return await message.reply("_This command is for groups_");
+		if (!isAdmin(message.jid, message.user, message.client)) return await message.reply("_I'm not admin_");
+		const chatid = message.jid;
+		const command = typeof match === "string" ? match.trim().toLowerCase() : "";
+		if (command !== "on" && command !== "off") return await message.reply("Usage: .antibot on/off");
+		const isban = await isBanned(chatid);
+		if (command === "on") {
+			if (isban) return await message.reply("_Already ON_");
+			await banUser(chatid);
+			return await message.reply("_Antibot Set to ON_");
+		} else if (command === "off") {
+			if (!isban) return await message.reply("_Antibot IS not ON_");
+			await unbanUser(chatid);
+			return await message.reply("_Antibot deactivated_");
+		}
+	},
+);
 
 Module(
 	{
