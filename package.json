@@ -1,6 +1,6 @@
 {
 	"name": "fx-md",
-	"version": "v3.0.1",
+	"version": "v3.3.2",
 	"description": "Whatsapp Bot",
 	"main": "index.js",
 	"scripts": {
