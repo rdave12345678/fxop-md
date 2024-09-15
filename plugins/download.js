@@ -1,5 +1,23 @@
-const { Module, mode, toPTT, twitter, getJson, IronMan, getBuffer } = require("../lib");
+const { Module, mode, toPTT, twitter, getJson, IronMan, getBuffer, aptoideDl } = require("../lib");
 const { ytPlay } = require("client");
+
+Module(
+	{
+		pattern: "apk ?(.*)",
+		fromMe: mode,
+		desc: "Downloads and sends an app",
+		type: "download",
+	},
+	async (message, match) => {
+		const appId = match;
+		if (!appId) return await message.reply(`\`\`\`Wrong format\n\n${message.prefix}apk FreeFire\`\`\``);
+		const msg = await message.reply("_Downloading " + match + "_");
+		const appInfo = await aptoideDl(appId);
+		const buff = await getBuffer(appInfo.link);
+		await msg.edit("*_Download Success_*");
+		await message.sendMessage(message.jid, buff, { mimetype: "application/vnd.android.package-archive", filename: `${appId.appname}.apk`, caption: match }, "document");
+	},
+);
 
 Module(
 	{
