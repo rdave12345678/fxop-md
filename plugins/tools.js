@@ -1,4 +1,4 @@
-const { Module, mode, qrcode, isUrl, Bitly, removeBg, tinyurl, ssweb, shortenurl } = require("../lib");
+const { Module, mode, qrcode, isUrl, Bitly, removeBg, tinyurl, ssweb, shortenurl, upload } = require("../lib");
 const config = require("../config");
 
 Module(
@@ -106,5 +106,21 @@ Module(
 		const shortenedTxt = await shortenurl(match);
 		await msg.edit("*_Success_*");
 		return await message.send(shortenedTxt);
+	},
+);
+
+Module(
+	{
+		pattern: "upload",
+		fromMe: mode,
+		desc: "Uploads Image",
+		type: "tools",
+	},
+	async (message, match, m) => {
+		if (!message.reply_message) return await message.reply("_Reply Image_");
+		const msg = await message.reply("_Uploading File_");
+		const buff = await m.quoted.download();
+		const url = await upload(buff);
+		return await msg.edit(`*IMAGE UPLOADED: ${url}*`);
 	},
 );

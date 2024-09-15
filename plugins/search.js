@@ -126,3 +126,4 @@ Module(
 		return await msg.edit(songLyrics);
 	},
 );
+
