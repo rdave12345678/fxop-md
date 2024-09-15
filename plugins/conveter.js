@@ -9,10 +9,11 @@ Module(
 		type: "converter",
 	},
 	async (message, match, m) => {
-		if (!message.reply_message && (!message.reply_message.video || !message.reply_message.sticker || !message.reply_message.text)) return await message.reply("_Reply to photo/video/text_");
-		var buff;
-		buff = await m.quoted.download();
-		message.sendMessage(message.jid, buff, { packname: config.PACKNAME, author: config.AUTHOR }, "sticker");
+		if (!message.reply_message.video || !message.reply_message.sticker) return await message.reply("_Reply Photo/Video_");
+		let buff = await m.quoted.download();
+		const packname = config.STICKER_PACK.split(";")[0];
+		const author = config.STICKER_PACK.split(";")[1];
+		message.sendMessage(message.jid, buff, { packname, author }, "sticker");
 	},
 );
 
@@ -42,7 +43,7 @@ Module(
 	async (message, match, m) => {
 		if (!message.reply_message.sticker) return await message.reply("_Not a sticker_");
 		let buff = await m.quoted.download();
-		return await message.sendMessage(message.jid, buff, {}, "image");
+		return await message.send(buff);
 	},
 );
 
@@ -57,8 +58,7 @@ Module(
 		let buff = await m.quoted.download();
 		console.log(typeof buff);
 		buff = await toAudio(buff, "mp3");
-		console.log(typeof buff);
-		return await message.sendMessage(message.jid, buff, { mimetype: "audio/mpeg" }, "audio");
+		return await message.send(buff);
 	},
 );
 
@@ -77,7 +77,7 @@ Module(
 		} else {
 			buff = await toAudio(buff, "mp4");
 		}
-		return await message.sendMessage(message.jid, buff, { mimetype: "video/mp4" }, "video");
+		return await message.send(buff);
 	},
 );
 
@@ -91,6 +91,6 @@ Module(
 	async (message, match, m) => {
 		if (!message.reply_message.sticker) return await message.reply("_Reply to a sticker_");
 		let buff = await m.quoted.download();
-		return await message.sendMessage(message.jid, buff, {}, "image");
+		return await message.send(buff);
 	},
 );
