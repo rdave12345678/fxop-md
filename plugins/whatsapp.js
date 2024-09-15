@@ -129,9 +129,13 @@ Module(
 		type: "whatsapp",
 	},
 	async (message, match, m, client) => {
-		if (message.isGroup) {
-			client.sendMessage(message.jid, { delete: message.reply_message.key });
+		if (!message.reply_message) {
+			await message.reply("Please reply to the message you want to delete.");
+			return;
 		}
+		await client.sendMessage(message.jid, {
+			delete: message.reply_message.key,
+		});
 	},
 );
 Module(
