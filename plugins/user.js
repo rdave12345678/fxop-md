@@ -2,6 +2,7 @@ const { Module, parsedJid } = require("../lib");
 const { WarnDB } = require("../lib/db");
 const { WARN_COUNT } = require("../config");
 const { getWarns, saveWarn, resetWarn, removeLastWarn } = WarnDB;
+const { getFilter, setFilter, deleteFilter } = require("../lib/db/filters");
 
 Module(
 	{
@@ -87,5 +88,79 @@ Module(
 				mentions: [userId],
 			});
 		}
+	},
+);
+
+Module(
+	{
+		pattern: "filter",
+		fromMe: true,
+		desc: "Adds a filter. When someone triggers the filter, it sends the corresponding response. To view your filter list, use `.filter`.",
+		type: "user",
+	},
+	async (message, match) => {
+		let keyword, response;
+		try {
+			[keyword, response] = match.split(":");
+		} catch {}
+
+		if (!match) {
+			const activeFilters = await getFilter(message.jid);
+			if (!activeFilters) {
+				await message.reply("No filters are currently set in this chat.");
+			} else {
+				let filterListMessage = "Your active filters for this chat:\n\n";
+				activeFilters.forEach(filter => {
+					filterListMessage += `✒ ${filter.dataValues.pattern}\n`;
+				});
+				filterListMessage += "Use: .filter keyword:message\nto set a new filter";
+				await message.reply(filterListMessage);
+			}
+		} else if (!keyword || !response) {
+			await message.reply("```Use: .filter keyword:message\nto set a filter```");
+		} else {
+			await setFilter(message.jid, keyword, response, true);
+			await message.reply(`_Successfully set filter for ${keyword}_`);
+		}
+	},
+);
+
+Module(
+	{
+		pattern: "stop",
+		fromMe: true,
+		desc: "Stops a previously added filter.",
+		type: "user",
+	},
+	async (message, match) => {
+		if (!match) return await message.reply("\n*Example:* ```.stop hello```");
+
+		const deletedFilter = await deleteFilter(message.jid, match);
+		if (!deletedFilter) {
+			await message.reply("No existing filter matches the provided input.");
+		} else {
+			await message.reply(`_Filter ${match} deleted_`);
+		}
+	},
+);
+
+Module(
+	{
+		on: "text",
+		fromMe: false,
+		dontAddCommandList: true,
+	},
+	async (message, match) => {
+		const activeFilters = await getFilter(message.jid);
+		if (!activeFilters) return;
+
+		activeFilters.forEach(async filter => {
+			const pattern = new RegExp(filter.dataValues.regex ? filter.dataValues.pattern : `\\b(${filter.dataValues.pattern})\\b`, "gm");
+			if (pattern.test(match)) {
+				await message.reply(filter.dataValues.text, {
+					quoted: message,
+				});
+			}
+		});
 	},
 );

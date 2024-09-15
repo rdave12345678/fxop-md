@@ -1,4 +1,4 @@
-const { Module, mode, serialize } = require("../lib");
+const { Module, mode, serialize, parsedJid } = require("../lib");
 const { PausedChats } = require("../lib/db");
 const { loadMessage, getName } = require("../lib/db/StoreDb");
 const { DELETED_LOG_CHAT, DELETED_LOG, STATUS_SAVER } = require("../config");
@@ -206,5 +206,21 @@ Module(
 			name = `_Group : ${gname}_\n_Name : ${getname}_`;
 		}
 		return await message.sendMessage(DELETED_LOG_CHAT, `_Message Deleted_\n_From : ${msg.from}_\n${name}\n_SenderJid : ${msg.sender}_`, { quoted: deleted });
+	},
+);
+
+Module(
+	{
+		pattern: "fd",
+		fromMe: mode,
+		desc: "Forwards the replied Message",
+		type: "Util",
+	},
+	async (message, match, m) => {
+		if (!m.quoted) return message.reply("Reply to something");
+		let jids = parsedJid(match);
+		for (let i of jids) {
+			await message.forward(i, message.reply_message.message);
+		}
 	},
 );
