@@ -1,6 +1,7 @@
-const { Module, mode } = require("../lib");
+const { Module } = require("../lib");
 const { parsedJid } = require("../lib/functions");
 const { banUser, unbanUser, isBanned } = require("../lib/db/ban");
+
 Module(
 	{
 		on: "message",
@@ -19,36 +20,27 @@ Module(
 
 Module(
 	{
-		pattern: "banbot",
+		pattern: "antibot ?(.*)",
 		fromMe: true,
-		desc: "ban bot from a chat",
-		type: "user",
+		desc: "Turn antibot on or off",
+		type: "group",
 	},
 	async (message, match) => {
+		if (!message.isGroup) return await message.reply("_This command is for groups_");
+		const isUserAdmin = await isAdmin(message.jid, message.participant, client);
+		if (!isUserAdmin) return await message.reply("_You need to be an admin to use this command_");
 		const chatid = message.jid;
+		const command = match.trim().toLowerCase();
+		if (command !== "on" && command !== "off") return await message.reply("Usage: .antibot on/off");
 		const isban = await isBanned(chatid);
-		if (isban) {
-			return await message.sendMessage(message.jid, "Bot is already banned");
+		if (command === "on") {
+			if (isban) return await message.reply("Antibot is already active in this chat");
+			await banUser(chatid);
+			return await message.reply("Antibot activated. Bot will not respond in this chat.");
+		} else if (command === "off") {
+			if (!isban) return await message.reply("Antibot is not active in this chat");
+			await unbanUser(chatid);
+			return await message.reply("Antibot deactivated. Bot will now respond in this chat.");
 		}
-		await banUser(chatid);
-		return await message.sendMessage(message.jid, "Bot banned");
-	},
-);
-
-Module(
-	{
-		pattern: "unbanbot",
-		fromMe: true,
-		desc: "Unban bot from a chat",
-		type: "user",
-	},
-	async (message, match) => {
-		const chatid = message.jid;
-		const isban = await isBanned(chatid);
-		if (!isban) {
-			return await message.sendMessage(message.jid, "Bot is not banned");
-		}
-		await unbanUser(chatid);
-		return await message.sendMessage(message.jid, "Bot unbanned");
 	},
 );
