@@ -184,7 +184,16 @@ Module(
 
 		try {
 			const result = await (async () => {
-				return eval(evalCmd);
+				const wrappedCmd = `
+					(async () => {
+						try {
+							return await (async () => { ${evalCmd} })();
+						} catch (err) {
+							return 'Error: ' + err.message;
+						}
+					})();
+				`;
+				return eval(wrappedCmd);
 			})();
 
 			if (typeof result !== "string") {
