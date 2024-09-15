@@ -28,7 +28,7 @@ Module(
 		if (!message.isGroup) return await message.reply("_This command is for groups_");
 		if (!isAdmin(message.jid, message.user, message.client)) return await message.reply("_I'm not admin_");
 		const chatid = message.jid;
-		const command = match.trim().toLowerCase();
+		const command = typeof match === "string" ? match.trim().toLowerCase() : "";
 		if (command !== "on" && command !== "off") return await message.reply("Usage: .antibot on/off");
 		const isban = await isBanned(chatid);
 		if (command === "on") {
