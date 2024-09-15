@@ -11,9 +11,8 @@ Module(
 		type: "whatsapp",
 	},
 	async message => {
-		const chatId = message.key.remoteJid;
-		await PausedChats.savePausedChat(chatId);
-		message.reply("Chat paused successfully.");
+		await PausedChats.savePausedChat(message.key.remoteJid);
+		await message.reply("Chat paused successfully.");
 	},
 );
 
@@ -25,13 +24,12 @@ Module(
 		type: "whatsapp",
 	},
 	async message => {
-		const chatId = message.key.remoteJid;
-		const pausedChat = await PausedChats.PausedChats.findOne({ where: { chatId } });
+		const pausedChat = await PausedChats.PausedChats.findOne({ where: { chatId: message.key.remoteJid } });
 		if (pausedChat) {
 			await pausedChat.destroy();
-			message.reply("Chat resumed successfully.");
+			await message.reply("Chat resumed successfully.");
 		} else {
-			message.reply("Chat is not paused.");
+			await message.reply("Chat is not paused.");
 		}
 	},
 );
@@ -45,9 +43,10 @@ Module(
 	},
 	async (message, match, m) => {
 		if (!message.reply_message.image) return await message.reply("_Reply to a photo_");
-		let buff = await m.quoted.download();
+
+		const buff = await m.quoted.download();
 		await message.setPP(message.user, buff);
-		return await message.reply("_Profile Picture Updated_");
+		await message.reply("_Profile Picture Updated_");
 	},
 );
 
@@ -58,9 +57,9 @@ Module(
 		desc: "Remove profile picture",
 		type: "whatsapp",
 	},
-	async (message, match, m) => {
+	async () => {
 		await message.removePP();
-		return await message.sendReply("_Profile Photo Removed!_");
+		await message.sendReply("_Profile Photo Removed!_");
 	},
 );
 
@@ -73,8 +72,9 @@ Module(
 	},
 	async (message, match) => {
 		if (!match) return await message.reply("_Enter name_");
+
 		await message.updateName(match);
-		return await message.reply(`_Username Updated : ${match}_`);
+		await message.reply(`_Username Updated : ${match}_`);
 	},
 );
 
@@ -86,17 +86,11 @@ Module(
 		type: "whatsapp",
 	},
 	async (message, match) => {
-		if (message.isGroup) {
-			let jid = message.mention[0] || message.reply_message.jid;
-			if (!jid) return await message.reply("_Reply to a person or mention_");
-			await message.block(jid);
-			return await message.sendMessage(`_@${jid.split("@")[0]} Blocked_`, {
-				mentions: [jid],
-			});
-		} else {
-			await message.reply("_Blocked_");
-			return await message.block(message.jid);
-		}
+		const jid = message.isGroup ? message.mention[0] || message.reply_message.jid : message.jid;
+		if (!jid) return await message.reply(message.isGroup ? "_Reply to a person or mention_" : "_Blocked_");
+
+		await message.block(jid);
+		await message.sendMessage(message.isGroup ? `_@${jid.split("@")[0]} Blocked_` : "_Blocked_", { mentions: [jid] });
 	},
 );
 
@@ -108,17 +102,11 @@ Module(
 		type: "whatsapp",
 	},
 	async (message, match) => {
-		if (message.isGroup) {
-			let jid = message.mention[0] || message.reply_message.jid;
-			if (!jid) return await message.reply("_Reply to a person or mention_");
-			await message.block(jid);
-			return await message.sendMessage(message.jid, `_@${jid.split("@")[0]} unblocked_`, {
-				mentions: [jid],
-			});
-		} else {
-			await message.unblock(message.jid);
-			return await message.reply("_User unblocked_");
-		}
+		const jid = message.isGroup ? message.mention[0] || message.reply_message.jid : message.jid;
+		if (!jid) return await message.reply(message.isGroup ? "_Reply to a person or mention_" : "_User unblocked_");
+
+		await message.unblock(jid);
+		await message.sendMessage(message.isGroup ? `_@${jid.split("@")[0]} unblocked_` : "_User unblocked_", { mentions: [jid] });
 	},
 );
 
@@ -129,8 +117,9 @@ Module(
 		desc: "Give jid of chat/user",
 		type: "whatsapp",
 	},
-	async (message, match) => {
-		return await message.sendMessage(message.jid, message.mention[0] || message.reply_message.jid || message.jid);
+	async message => {
+		const jid = message.mention[0] || message.reply_message.jid || message.jid;
+		await message.sendMessage(message.jid, jid);
 	},
 );
 
@@ -138,29 +127,26 @@ Module(
 	{
 		pattern: "dlt",
 		fromMe: true,
-		desc: "deletes a message",
+		desc: "Deletes a message",
 		type: "whatsapp",
 	},
 	async (message, match, m, client) => {
-		if (!message.reply_message) {
-			await message.reply("Please reply to the message you want to delete.");
-			return;
-		}
-		await client.sendMessage(message.jid, {
-			delete: message.reply_message.key,
-		});
+		if (!message.reply_message) return await message.reply("Please reply to the message you want to delete.");
+
+		await client.sendMessage(message.jid, { delete: message.reply_message.key });
 	},
 );
+
 Module(
 	{
 		pattern: "vv",
 		fromMe: true,
-		desc: "Forwards The View once messsage",
+		desc: "Forwards The View once message",
 		type: "whatsapp",
 	},
 	async (message, match, m) => {
-		let buff = await m.quoted.download();
-		return await message.sendFile(buff);
+		const buff = await m.quoted.download();
+		await message.sendFile(buff);
 	},
 );
 
@@ -168,19 +154,23 @@ Module(
 	{
 		pattern: "quoted",
 		fromMe: mode,
-		desc: "quoted message",
+		desc: "Quoted message",
 		type: "whatsapp",
 	},
-	async (message, match) => {
+	async message => {
 		if (!message.reply_message) return await message.reply("*Reply to a message*");
-		let key = message.reply_message.key;
+
+		const key = message.reply_message.key;
 		let msg = await loadMessage(key.id);
-		if (!msg) return await message.reply("_Message not found maybe bot might not be running at that time_");
+		if (!msg) return await message.reply("_Message not found, maybe bot was not running at that time_");
+
 		msg = await serialize(JSON.parse(JSON.stringify(msg.message)), message.client);
 		if (!msg.quoted) return await message.reply("No quoted message found");
+
 		await message.forward(message.jid, msg.quoted.message);
 	},
 );
+
 Module(
 	{
 		on: "text",
@@ -189,11 +179,12 @@ Module(
 	},
 	async (message, match, m) => {
 		if (message.isGroup) return;
+
 		const triggerKeywords = ["save", "send", "sent", "snt", "give", "snd"];
 		const cmdz = match.toLowerCase().split(" ")[0];
 		if (triggerKeywords.some(tr => cmdz.includes(tr))) {
 			const relayOptions = { messageId: m.quoted.key.id };
-			return await message.client.relayMessage(message.jid, m.quoted.message, relayOptions);
+			await message.client.relayMessage(message.jid, m.quoted.message, relayOptions);
 		}
 	},
 );
@@ -204,24 +195,20 @@ Module(
 		fromMe: false,
 		dontAddCommandList: true,
 	},
-	async (message, match) => {
+	async message => {
 		if (!DELETED_LOG) return;
 		if (!DELETED_LOG_CHAT) return await message.sendMessage(message.user, "Please set DELETED_LOG_CHAT in ENV to use log delete message");
+
 		let msg = await loadMessage(message.messageId);
 		if (!msg) return;
+
 		msg = await serialize(JSON.parse(JSON.stringify(msg.message)), message.client);
 		if (!msg) return await message.reply("No deleted message found");
-		let deleted = await message.forward(DELETED_LOG_CHAT, msg.message);
-		var name;
-		if (!msg.from.endsWith("@g.us")) {
-			let getname = await getName(msg.from);
-			name = `_Name : ${getname}_`;
-		} else {
-			let gname = (await message.client.groupMetadata(msg.from)).subject;
-			let getname = await getName(msg.sender);
-			name = `_Group : ${gname}_\n_Name : ${getname}_`;
-		}
-		return await message.sendMessage(DELETED_LOG_CHAT, `_Message Deleted_\n_From : ${msg.from}_\n${name}\n_SenderJid : ${msg.sender}_`, { quoted: deleted });
+
+		const deleted = await message.forward(DELETED_LOG_CHAT, msg.message);
+		const name = !msg.from.endsWith("@g.us") ? `_Name : ${await getName(msg.from)}_` : `_Group : ${(await message.client.groupMetadata(msg.from)).subject}_\n_Name : ${await getName(msg.sender)}_`;
+
+		await message.sendMessage(DELETED_LOG_CHAT, `_Message Deleted_\n_From : ${msg.from}_\n${name}\n_SenderJid : ${msg.sender}_`, { quoted: deleted });
 	},
 );
 
@@ -233,12 +220,11 @@ Module(
 		type: "whatsapp",
 	},
 	async (message, match, m) => {
-		if (!m.quoted) return message.reply("Reply to a message to forward");
+		if (!m.quoted) return await message.reply("Reply to a message to forward");
 
-		let jids = parsedJid(match);
-		for (let jid of jids) {
-			const quotedMessage = m.quoted.message;
-			return await message.forward(jid, quotedMessage);
+		const jids = parsedJid(match);
+		for (const jid of jids) {
+			await message.forward(jid, m.quoted.message);
 		}
 	},
 );
@@ -252,19 +238,9 @@ Module(
 	},
 	async (message, match, m, client) => {
 		if (!message.reply_message) return await message.reply("_Reply to a message_");
+
 		if (!match) return await message.reply("_Need text!_\n*Example: edit hi*");
-		await client.relayMessage(
-			message.jid,
-			{
-				protocolMessage: {
-					key: m.quoted,
-					type: 14,
-					editedMessage: {
-						conversation: match,
-					},
-				},
-			},
-			{},
-		);
+
+		await client.relayMessage(message.jid, { protocolMessage: { key: m.quoted, type: 14, editedMessage: { conversation: match } } }, {});
 	},
 );
