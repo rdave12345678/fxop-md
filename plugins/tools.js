@@ -90,3 +90,20 @@ Module(
 		return await message.send(buff);
 	},
 );
+
+Module(
+	{
+		pattern: "shortlink",
+		fromMe: mode,
+		desc: "Shortens link Url",
+		type: "tools",
+	},
+	async (message, match, m) => {
+		if (!match) return await message.sendReply("_Provide Url_");
+		if (!isUrl(match)) return await message.sendReply("_Not A Url_");
+		const msg = await message.reply("_Shorting Link_");
+		const shortended_txt = await shortenurl(match);
+		await msg.edit("*_Success_*");
+		return await message.send(shortended_txt);
+	},
+);
