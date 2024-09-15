@@ -1,5 +1,4 @@
-const { Module } = require("../lib");
-const { parsedJid } = require("../lib/functions");
+const { Module, parsedJid, isAdmin } = require("../lib");
 const { banUser, unbanUser, isBanned } = require("../lib/db/ban");
 
 Module(
