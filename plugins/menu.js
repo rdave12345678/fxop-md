@@ -54,8 +54,6 @@ Description: ${plugin.description || "No description available"}\`\`\``);
 					});
 					menuText += `\n╰──────────────\`\`\`\n`;
 				});
-
-			menuText += `_🔖Send ${prefix}menu <command name> to get detailed information of a specific command._\n*📍Eg:* _${prefix}menu plugin_`;
 			return await message.send(menuText.trim());
 		}
 	},
