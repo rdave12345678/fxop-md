@@ -98,6 +98,26 @@ Module(
 
 Module(
 	{
+		pattern: "del",
+		fromMe: true,
+		desc: "deletes a message from participants in a group (bot must be admin)",
+		type: "group",
+	},
+	async (message, match, m, client) => {
+		if (!message.isGroup) return await message.reply("This command can only be used in groups.");
+		if (!message.reply_message) return await message.reply("Please reply to the message you want to delete.");
+		const groupMetadata = await client.groupMetadata(message.jid);
+		const participants = groupMetadata.participants;
+		const botJid = client.user.id.split(":")[0] + "@s.whatsapp.net";
+		const isBotAdmin = participants.some(p => p.id === botJid && p.admin);
+
+		if (!isBotAdmin) return await message.reply("I need to be an admin to delete messages from others.");
+		await client.sendMessage(message.jid, { delete: message.reply_message.key });
+	},
+);
+
+Module(
+	{
 		pattern: "promote",
 		fromMe: true,
 		desc: "promote to admin",
