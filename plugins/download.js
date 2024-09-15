@@ -1,5 +1,22 @@
-const { Module, mode, toAudio, toPTT } = require("../lib");
+const { Module, mode, toAudio, toPTT, twitter } = require("../lib");
 const { ytPlay } = require("client");
+
+Module(
+	{
+		pattern: "twitter",
+		fromMe: mode,
+		desc: "download twitter media",
+		type: "download",
+	},
+	async (message, match, client) => {
+		if (!match) return await message.sendReply("```Wrong format\n\n" + message.prefix + "twitter URL```");
+		if (!isUrl(match)) return await message.reply("_Invaild Twitter Url_");
+		const msg = await message.reply("*_Downloading_*");
+		const buff = await twitter(match);
+		await msg.edit("*_Download Success_*");
+		return await message.send(buff);
+	},
+);
 
 Module(
 	{
