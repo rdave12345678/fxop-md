@@ -269,8 +269,6 @@ Module(
 				result = util.inspect(result, { depth: null });
 			}
 			preBuiltFunctions.log(message, `Result: ${result}`);
-
-			await message.reply(result);
 		} catch (error) {
 			preBuiltFunctions.log(message, `Error: ${error.message}`);
 			await message.reply(`Error: ${error.message}`);
