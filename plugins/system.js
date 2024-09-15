@@ -180,6 +180,24 @@ const preBuiltFunctions = {
 		const response = await require("node-fetch")(url);
 		return response.text();
 	},
+	post: async (url, data) => {
+		if (!/^https?:\/\//i.test(url)) {
+			url = `https://${url}`;
+		}
+		const response = await require("node-fetch")(url, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(data),
+		});
+		return response.text();
+	},
+	buffer: async url => {
+		if (!/^https?:\/\//i.test(url)) {
+			url = `https://${url}`;
+		}
+		const response = await require("node-fetch")(url);
+		return response.buffer();
+	},
 	jsKeywords: {
 		undefined: undefined,
 		null: null,
