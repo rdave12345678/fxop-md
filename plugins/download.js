@@ -8,8 +8,8 @@ Module(
 		desc: "Fetches Video",
 		type: "download",
 	},
-	async (message, match, client) => {
-		if (!match) return message.sendReply(`\`\`\`Wrong Usage\n\n${message.prefix}video Just the two of us\`\`\``);
+	async (message, match) => {
+		if (!match[0]) return message.sendReply(`\`\`\`Wrong Usage\n\n${message.prefix}video Just the two of us\`\`\``);
 
 		const smsg = await message.reply("*_Searching_*");
 		const {
@@ -28,8 +28,8 @@ Module(
 		desc: "Fetches Music",
 		type: "download",
 	},
-	async (message, match, client) => {
-		if (!match) return message.sendReply(`\`\`\`Wrong Usage\n\n${message.prefix}play StarMan\`\`\``);
+	async (message, match) => {
+		if (!match[0]) return message.sendReply(`\`\`\`Wrong Usage\n\n${message.prefix}play StarMan\`\`\``);
 		const smsg = await message.reply("*_Downloading_*");
 		const {
 			details: { title, description },
