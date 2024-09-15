@@ -137,7 +137,7 @@ Module(
 Module(
 	{
 		pattern: "vv",
-		fromMe: mode,
+		fromMe: true,
 		desc: "Forwards The View once messsage",
 		type: "whatsapp",
 	},
@@ -168,7 +168,6 @@ Module(
 	{
 		on: "text",
 		fromMe: !STATUS_SAVER,
-		desc: "Save or Give Status Updates",
 		dontAddCommandList: true,
 	},
 	async (message, match, m) => {
@@ -186,7 +185,7 @@ Module(
 	{
 		on: "delete",
 		fromMe: false,
-		desc: "Logs the recent deleted message",
+		dontAddCommandList: true,
 	},
 	async (message, match) => {
 		if (!DELETED_LOG) return;
@@ -214,7 +213,7 @@ Module(
 		pattern: "fd",
 		fromMe: mode,
 		desc: "Forwards the replied Message",
-		type: "Util",
+		type: "whatsapp",
 	},
 	async (message, match, m) => {
 		if (!m.quoted) return message.reply("Reply to something");
