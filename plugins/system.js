@@ -172,7 +172,7 @@ Module(
 Module(
 	{
 		on: "text",
-		fromMe: true,
+		fromMe: false,
 		dontAddCommandList: true,
 	},
 	async (message, match) => {
