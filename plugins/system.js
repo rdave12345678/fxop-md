@@ -172,8 +172,11 @@ Module(
 );
 
 const preBuiltFunctions = {
-	log: (message, ...args) => message.send(args.join(" ")), // Update to accept message
+	log: (message, ...args) => message.send(args.join(" ")),
 	fetch: async url => {
+		if (!/^https?:\/\//i.test(url)) {
+			url = `https://${url}`;
+		}
 		const response = await require("node-fetch")(url);
 		return response.text();
 	},
