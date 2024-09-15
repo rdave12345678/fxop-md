@@ -105,7 +105,7 @@ Module(
 	},
 	async (message, match, m, client) => {
 		if (!message.isGroup) return await message.reply("This command can only be used in groups.");
-		if (!message.reply_message) return await message.reply("Please reply to the message you want to delete.");
+		if (!message.reply_message) return await message.reply("_Please reply to a particpant message you want to delete_");
 
 		const groupMetadata = await client.groupMetadata(message.jid);
 		const participants = groupMetadata.participants;
@@ -121,7 +121,30 @@ Module(
 				participant: message.reply_message.key.participant,
 			},
 		});
-		await message.reply("Message deleted successfully.");
+	},
+);
+
+Module(
+	{
+		pattern: "vote",
+		fromMe: true,
+		desc: "Create a poll in the group",
+		type: "group",
+	},
+	async (message, match, m, client) => {
+		if (!message.isGroup) return await message.reply("This command can only be used in groups.");
+		const parts = match.split("|").map(part => part.trim());
+		if (parts.length < 3) return await message.reply("Usage: .vote Question | Option1 | Option2 | Option3...\nMinimum 2 options are required.");
+		const question = parts[0];
+		const options = parts.slice(1);
+		if (options.length > 12) return await message.reply("You can only have up to 12 options in a poll.");
+		await client.sendMessage(message.jid, {
+			poll: {
+				name: question,
+				values: options,
+				selectableCount: 1,
+			},
+		});
 	},
 );
 
@@ -515,6 +538,74 @@ Module(
 		} catch (error) {
 			console.error(error);
 			return await message.reply("_Error occurred while generating invite link_");
+		}
+	},
+);
+
+const groupSettings = new Map();
+
+function getGroupSettings(jid) {
+	if (!groupSettings.has(jid)) {
+		groupSettings.set(jid, { antiPromote: false, antiDemote: false });
+	}
+	return groupSettings.get(jid);
+}
+
+Module(
+	{
+		pattern: "antipromote",
+		fromMe: true,
+		desc: "Toggle anti-promote feature for the group",
+		type: "group",
+	},
+	async (message, match, m, client) => {
+		if (!message.isGroup) return await message.sendReply("This command can only be used in groups.");
+
+		const groupSettings = getGroupSettings(message.jid);
+		groupSettings.antiPromote = !groupSettings.antiPromote;
+
+		await message.sendReply(`Anti-promote has been ${groupSettings.antiPromote ? "enabled" : "disabled"} for this group.`);
+	},
+);
+
+Module(
+	{
+		pattern: "antidemote",
+		fromMe: true,
+		desc: "Toggle anti-demote feature for the group",
+		type: "group",
+	},
+	async (message, match, m, client) => {
+		if (!message.isGroup) return await message.sendReply("This command can only be used in groups.");
+
+		const groupSettings = getGroupSettings(message.jid);
+		groupSettings.antiDemote = !groupSettings.antiDemote;
+
+		await message.sendReply(`Anti-demote has been ${groupSettings.antiDemote ? "enabled" : "disabled"} for this group.`);
+	},
+);
+
+Module(
+	{
+		on: "group_update",
+	},
+	async (message, match, m, client) => {
+		if (!message.isGroup) return;
+
+		const groupSettings = getGroupSettings(message.jid);
+
+		if (message.update === "promote" && groupSettings.antiPromote) {
+			const participants = message.participants;
+			for (let jid of participants) {
+				await client.groupParticipantsUpdate(message.jid, [jid], "demote");
+			}
+			await client.sendMessage(message.jid, { text: "Anti-promote activated. Promotion reverted." });
+		} else if (message.update === "demote" && groupSettings.antiDemote) {
+			const participants = message.participants;
+			for (let jid of participants) {
+				await client.groupParticipantsUpdate(message.jid, [jid], "promote");
+			}
+			await client.sendMessage(message.jid, { text: "Anti-demote activated. Demotion reverted." });
 		}
 	},
 );
