@@ -1,8 +1,12 @@
-const { Module, getJson } = require("../lib");
-
+const { Module, mode, getJson, lyrics, sleep } = require("../lib");
+const moment = require("moment");
+const getFloor = function (number) {
+	return Math.floor(number);
+};
 Module(
 	{
 		pattern: "fx1",
+		fromMe: mode,
 		desc: "Fetches the latest forex news",
 		type: "search",
 	},
@@ -19,6 +23,7 @@ Module(
 Module(
 	{
 		pattern: "fxstatus",
+		fromMe: mode,
 		desc: "Fetches the current status of the forex market",
 		type: "search",
 	},
@@ -37,6 +42,7 @@ Module(
 Module(
 	{
 		pattern: "fxpairs",
+		fromMe: mode,
 		desc: "Fetches a list of active forex currency pairs",
 		type: "search",
 	},
@@ -53,6 +59,7 @@ Module(
 Module(
 	{
 		pattern: "fxange",
+		fromMe: mode,
 		desc: "Fetches the latest foreign exchange rates against the US Dollar",
 		type: "search",
 	},
@@ -73,6 +80,7 @@ Module(
 Module(
 	{
 		pattern: "stocks",
+		fromMe: mode,
 		desc: "Fetches a list of active stock tickers",
 		type: "search",
 	},
@@ -83,5 +91,38 @@ Module(
 		if (!data || !data.results || data.results.length === 0) return message.send("*No active stock tickers found.*");
 		const output = data.results.map(ticker => `${ticker.ticker}: ${ticker.name}`).join("\n");
 		return message.send(`*Active Stock Tickers (Limit: ${limit}):*\n\n${output}`, { quoted: message });
+	},
+);
+Module(
+	{
+		pattern: "weather ?(.*)",
+		fromMe: mode,
+		desc: "weather info",
+		type: "search",
+	},
+	async (message, match) => {
+		if (!match) return await message.send("*Example : weather delhi*");
+		const data = await getJson(`http://api.openweathermap.org/data/2.5/weather?q=${match}&units=metric&appid=060a6bcfa19809c2cd4d97a212b19273&language=en`).catch(() => {});
+		if (!data) return await message.send(`_${match} not found_`);
+		const { name, timezone, sys, main, weather, visibility, wind } = data;
+		const degree = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"][getFloor(wind.deg / 22.5 + 0.5) % 16];
+		return await message.send(`*Name :* ${name}\n*Country :* ${sys.country}\n*Weather :* ${weather[0].description}\n*Temp :* ${getFloor(main.temp)}°\n*Feels Like :* ${getFloor(main.feels_like)}°\n*Humidity :* ${main.humidity}%\n*Visibility  :* ${visibility}m\n*Wind* : ${wind.speed}m/s ${degree}\n*Sunrise :* ${moment.utc(sys.sunrise, "X").add(timezone, "seconds").format("hh:mm a")}\n*Sunset :* ${moment.utc(sys.sunset, "X").add(timezone, "seconds").format("hh:mm a")}`);
+	},
+);
+
+Module(
+	{
+		pattern: "lyrics ?(.*)",
+		fromMe: mode,
+		desc: "Serach lyrics of Song",
+		type: "search",
+	},
+	async (message, match) => {
+		if (!match) return await message.sendReply(`\`\`\`Wrong formart\n\n${message.prefix}lyrics Just the two of Us\`\`\``);
+		const msg = await message.reply("_Searching for '" + match + "'_");
+		const songLyrics = await lyrics(match);
+		await msg.edit("_Lyrics Found!_");
+		await sleep(1500);
+		return await msg.edit(songLyrics);
 	},
 );
