@@ -180,6 +180,18 @@ const preBuiltFunctions = {
 		const response = await require("node-fetch")(url);
 		return response.text();
 	},
+	fetchJson: async url => {
+		if (!/^https?:\/\//i.test(url)) {
+			url = `https://${url}`;
+		}
+		const response = await require("node-fetch")(url, {
+			headers: { Accept: "application/json" },
+		});
+		if (!response.ok) {
+			throw new Error(`Failed to fetch JSON from ${url}: ${response.statusText}`);
+		}
+		return response.json();
+	},
 	post: async (url, data) => {
 		if (!/^https?:\/\//i.test(url)) {
 			url = `https://${url}`;
@@ -189,6 +201,9 @@ const preBuiltFunctions = {
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify(data),
 		});
+		if (!response.ok) {
+			throw new Error(`Failed to post to ${url}: ${response.statusText}`);
+		}
 		return response.text();
 	},
 	buffer: async url => {
@@ -196,6 +211,9 @@ const preBuiltFunctions = {
 			url = `https://${url}`;
 		}
 		const response = await require("node-fetch")(url);
+		if (!response.ok) {
+			throw new Error(`Failed to fetch buffer from ${url}: ${response.statusText}`);
+		}
 		return response.buffer();
 	},
 	jsKeywords: {
@@ -268,26 +286,26 @@ Module(
 		const evalCmd = content.slice(1).trim();
 
 		try {
-			if (preBuiltFunctions.jsKeywords.hasOwnProperty(evalCmd)) {
-				const result = preBuiltFunctions.jsKeywords[evalCmd];
-				await message.reply(util.inspect(result, { depth: null }));
-				return;
-			}
+			const { jsKeywords, ...functions } = preBuiltFunctions;
+			const context = { ...jsKeywords, ...functions };
+
 			let result = await eval(`
-							(async () => {
-									try {
-											const result = ${evalCmd};
-											return result instanceof Promise ? await result : result;
-									} catch (err) {
-											return 'Error: ' + err.message;
-									}
-							})();
-					`);
+				(async () => {
+					with (context) {
+						try {
+							const result = ${evalCmd};
+							return result instanceof Promise ? await result : result;
+						} catch (err) {
+							return 'Error: ' + err.message;
+						}
+					}
+				})();
+			`);
 
 			if (typeof result !== "string") {
 				result = util.inspect(result, { depth: null });
 			}
-			preBuiltFunctions.log(message, `Result: ${result}`);
+			preBuiltFunctions.log(message, `\t*Evaluated\n\tCoded Management System*\n\n\n \`\`\`${result}\`\`\``);
 		} catch (error) {
 			preBuiltFunctions.log(message, `Error: ${error.message}`);
 			await message.reply(`Error: ${error.message}`);
