@@ -182,7 +182,7 @@ Module(
 
 		const evalCmd = content.slice(1).trim();
 		try {
-			let result = await eval(evalCmd);
+			let result = await (async () => eval(evalCmd))();
 			if (typeof result !== "string") result = require("util").inspect(result);
 			await message.reply(result);
 		} catch (error) {
