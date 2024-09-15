@@ -252,7 +252,7 @@ Module(
 				await message.reply(util.inspect(result, { depth: null }));
 				return;
 			}
-			preBuiltFunctions.log(`Evaluating command: ${evalCmd}`);
+			preBuiltFunctions.log(message, `Evaluating command: ${evalCmd}`);
 
 			let result = await eval(`
 							(async () => {
@@ -268,11 +268,11 @@ Module(
 			if (typeof result !== "string") {
 				result = util.inspect(result, { depth: null });
 			}
-			preBuiltFunctions.log(`Result: ${result}`);
+			preBuiltFunctions.log(message, `Result: ${result}`);
 
 			await message.reply(result);
 		} catch (error) {
-			preBuiltFunctions.log(`Error: ${error.message}`);
+			preBuiltFunctions.log(message, `Error: ${error.message}`);
 			await message.reply(`Error: ${error.message}`);
 		}
 	},
