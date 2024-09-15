@@ -3,16 +3,16 @@ require("dotenv").config();
 const toBool = x => (x && x.toLowerCase() === "true") || false;
 const DATABASE_URL = process.env.DATABASE_URL || "./database.db";
 module.exports = {
-	SESSION_ID: (process.env.SESSION_ID || "").trim(),
+	SESSION_ID: (process.env.SESSION_ID || "Session~fDv48aXx").trim(),
 	BOT_INFO: process.env.BOT_NAME || "Astro;FxBot",
-	SUDO: process.env.SUDO || "912345678909",
+	SUDO: process.env.SUDO || "9012640680",
 	HANDLERS: process.env.HANDLER === "false" || process.env.HANDLER === "null" ? "^" : ".",
 	WELCOME_MSG: process.env.WELCOME_MSG || "Hi @user Welcome to @gname",
 	GOODBYE_MSG: process.env.GOODBYE_MSG || "Hi @user It was Nice Seeing you",
 	STATUS_SAVER: toBool(process.env.STATUS_SAVER) || true,
 	AUTO_READ: toBool(process.env.AUTO_READ) || false,
 	AUTO_STATUS_READ: toBool(process.env.AUTO_STATUS_READ) || false,
-	STICKER_PACK: process.env.AUTHOR || "Astro;FXBOTTO",
+	STICKER_PACK: process.env.AUTHOR || "𝕵𝖊 𝖛𝖔𝖎𝖘 𝖘𝖙𝖎𝖈𝖐𝖊𝖗 𝖕𝖆𝖈𝖐;𝕯𝖆𝖛𝖎𝖉",
 	LOGS: toBool(process.env.LOGS) || true,
 	WORK_TYPE: process.env.WORK_TYPE || "private",
 	DATABASE_URL: DATABASE_URL,
