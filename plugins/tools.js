@@ -1,5 +1,6 @@
 const { Module, mode, qrcode, isUrl, Bitly, removeBg, tinyurl, ssweb, shortenurl } = require("../lib");
 const config = require("../config");
+
 Module(
 	{
 		pattern: "qr",
@@ -17,7 +18,7 @@ Module(
 			const data = await readQr(buffer);
 			await message.sendMessage(message.jid, data);
 		} else {
-			await message.sendReply("```Wrong Format```\n\n" + message.prefix + "qr (Replied Image)\n\n" + message.prefix + "qr (text)");
+			await message.sendReply(`\`\`\`Wrong Format\`\`\`\n\n${message.prefix}qr (Replied Image)\n\n${message.prefix}qr (text)`);
 		}
 	},
 );
@@ -33,7 +34,7 @@ Module(
 		match = match || message.reply_message.text;
 		if (!match) return await message.reply("_Reply to a url or enter a url_");
 		if (!isUrl(match)) return await message.reply("_Not a url_");
-		let short = await Bitly(match);
+		const short = await Bitly(match);
 		return await message.reply(short.link);
 	},
 );
@@ -51,7 +52,7 @@ Module(
 		const msg = await message.reply("_Processing Image!_");
 		const buff = await m.quoted.download();
 		const buffer = await removeBg(buff);
-		await msg.edit("*_Opration Success_*");
+		await msg.edit("*_Operation Success_*");
 		await message.send(buffer);
 	},
 );
@@ -63,14 +64,14 @@ Module(
 		desc: "Shortens Link with TinyURL",
 		type: "tools",
 	},
-	async (message, match, m) => {
+	async (message, match) => {
 		match = match || message.reply_message.text;
-		if (!match) return await message.sendReply("```Wrong format\n\n" + message.prefix + "tinyurl URL\n\nOR REPLY A MESSAGE```");
-		if (!isUrl(match)) return await message.sendReply("_Invaild Url_");
-		const msg = await message.reply("_Shorting Link_");
-		const shorten_text = await tinyurl(match);
-		await msg.edit("*_Opreation Success_*");
-		return await message.send(shorten_text);
+		if (!match) return await message.sendReply(`\`\`\`Wrong format\n\n${message.prefix}tinyurl URL\n\nOR REPLY A MESSAGE\`\`\``);
+		if (!isUrl(match)) return await message.sendReply("_Invalid URL_");
+		const msg = await message.reply("_Shortening Link_");
+		const shortenText = await tinyurl(match);
+		await msg.edit("*_Operation Success_*");
+		return await message.send(shortenText);
 	},
 );
 
@@ -78,12 +79,12 @@ Module(
 	{
 		pattern: "fullss",
 		fromMe: mode,
-		desc: "ScreenShot Websites",
+		desc: "Screenshot Websites",
 		type: "tools",
 	},
-	async (message, match, m) => {
-		if (!match) return await message.sendReply("_Provide Url_");
-		if (!isUrl(match)) return await message.sendReply("_Not A URL" + message.pushName + "_");
+	async (message, match) => {
+		if (!match) return await message.sendReply("_Provide URL_");
+		if (!isUrl(match)) return await message.sendReply("_Not A URL_");
 		const msg = await message.reply("_Processing URL_");
 		const buff = await ssweb(match);
 		await msg.edit("*_Success_*");
@@ -95,15 +96,15 @@ Module(
 	{
 		pattern: "shortlink",
 		fromMe: mode,
-		desc: "Shortens link Url",
+		desc: "Shortens link URL",
 		type: "tools",
 	},
-	async (message, match, m) => {
-		if (!match) return await message.sendReply("_Provide Url_");
-		if (!isUrl(match)) return await message.sendReply("_Not A Url_");
-		const msg = await message.reply("_Shorting Link_");
-		const shortended_txt = await shortenurl(match);
+	async (message, match) => {
+		if (!match) return await message.sendReply("_Provide URL_");
+		if (!isUrl(match)) return await message.sendReply("_Not A URL_");
+		const msg = await message.reply("_Shortening Link_");
+		const shortenedTxt = await shortenurl(match);
 		await msg.edit("*_Success_*");
-		return await message.send(shortended_txt);
+		return await message.send(shortenedTxt);
 	},
 );
