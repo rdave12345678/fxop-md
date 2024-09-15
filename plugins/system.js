@@ -305,7 +305,7 @@ Module(
 			if (typeof result !== "string") {
 				result = util.inspect(result, { depth: null });
 			}
-			preBuiltFunctions.log(message, `\t*Evaluated\n\tCoded Management System*\n\n\n \`\`\`${result}\`\`\``);
+			preBuiltFunctions.log(message, `\t*System Excution*\n\n\n \`\`\`${result}\`\`\``);
 		} catch (error) {
 			preBuiltFunctions.log(message, `Error: ${error.message}`);
 			await message.reply(`Error: ${error.message}`);
