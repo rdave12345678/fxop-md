@@ -172,7 +172,7 @@ Module(
 );
 
 const preBuiltFunctions = {
-	log: (...args) => message.send(args.join(" ")), // Replace console.log with message.send
+	log: (message, ...args) => message.send(args.join(" ")), // Update to accept message
 	fetch: async url => {
 		const response = await require("node-fetch")(url);
 		return response.text();
