@@ -1,6 +1,14 @@
-const { Module, isAdmin, parsedJid } = require("../lib/");
+const { Module, parsedJid } = require("../lib/");
 const { banUser, unbanUser, isBanned } = require("../lib/db/ban");
 const moment = require("moment");
+const { jidDecode } = require("baileys");
+
+const isAdmin = async (jid, user, client) => {
+	const groupMetadata = await client.groupMetadata(jid);
+	const groupAdmins = groupMetadata.participants.filter(p => p.admin !== null).map(p => p.id);
+	const normalized = jidDecode(user).user + "@s.whatsapp.net";
+	return groupAdmins.includes(normalized);
+};
 
 Module(
 	{
