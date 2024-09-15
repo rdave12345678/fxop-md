@@ -3,6 +3,22 @@ const { ytPlay } = require("client");
 
 Module(
 	{
+		pattern: "fb ?(.*)",
+		fromMe: mode,
+		desc: "Download Facebook video",
+		type: "download",
+	},
+	async (message, match, client) => {
+		match = match.reply_message || match.includes("https://facebook.com");
+		if (!match) return await message.sendReply("```Wrong format\n\n" + message.prefix + "fb URL```");
+		const response = await getJson(IronMan(`ironman/dl/fb?url=${match}`));
+		const buff = await getBuffer(response.ironman[0].url);
+		await message.send(buff);
+	},
+);
+
+Module(
+	{
 		pattern: "apk ?(.*)",
 		fromMe: mode,
 		desc: "Downloads and sends an app",
@@ -36,7 +52,7 @@ Module(
 
 Module(
 	{
-		pattern: "twitter",
+		pattern: "twitter ?(.*)",
 		fromMe: mode,
 		desc: "Download Twitter media",
 		type: "download",
@@ -52,7 +68,7 @@ Module(
 
 Module(
 	{
-		pattern: "video",
+		pattern: "video ?(.*)",
 		fromMe: mode,
 		desc: "Fetches Video",
 		type: "download",
@@ -68,7 +84,7 @@ Module(
 
 Module(
 	{
-		pattern: "play",
+		pattern: "play ?(.*)",
 		fromMe: mode,
 		desc: "Fetches Music",
 		type: "download",
