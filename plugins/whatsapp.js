@@ -53,6 +53,19 @@ Module(
 
 Module(
 	{
+		pattern: "rpp",
+		fromMe: true,
+		desc: "Remove profile picture",
+		type: "whatsapp",
+	},
+	async (message, match, m) => {
+		await message.removePP();
+		return await message.sendReply("_Profile Photo Removed!_");
+	},
+);
+
+Module(
+	{
 		pattern: "setname",
 		fromMe: true,
 		desc: "Set User name",
@@ -216,18 +229,16 @@ Module(
 	{
 		pattern: "forward",
 		fromMe: mode,
-		desc: "Forwards the replied text message",
+		desc: "Forwards the replied message (any type)",
 		type: "whatsapp",
 	},
 	async (message, match, m) => {
-		if (!m.quoted) return message.reply("Reply to a text message to forward");
-		const quotedMessage = m.quoted.text || m.quoted.caption;
-		if (!quotedMessage) return message.reply("This command only forwards text messages");
+		if (!m.quoted) return message.reply("Reply to a message to forward");
 
 		let jids = parsedJid(match);
 		for (let jid of jids) {
-			await message.forward(jid, quotedMessage);
-			await message.reply(`Message forwarded to ${jid}`);
+			const quotedMessage = m.quoted.message;
+			return await message.forward(jid, quotedMessage);
 		}
 	},
 );
