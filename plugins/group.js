@@ -30,12 +30,12 @@ Module(
 		if (!isAdmin(message.jid, message.user, message.client)) return await message.reply("_I'm not admin_");
 		const chatid = message.jid;
 		const command = typeof match === "string" ? match.trim().toLowerCase() : "";
-		if (command !== "on" && command !== "off") return await message.reply("Usage: .antibot on/off");
+		if (command !== "on" && command !== "off") return await message.reply("\t```Wrong format\n\n" + message.prefix + "antibot on\n\nOR\n\n" + message.prefix + "antibot off```");
 		const isban = await isBanned(chatid);
 		if (command === "on") {
 			if (isban) return await message.reply("_Already ON_");
 			await banUser(chatid);
-			return await message.reply("_Antibot Set to ON_");
+			return await message.reply("_Antibot Activated_");
 		} else if (command === "off") {
 			if (!isban) return await message.reply("_Antibot IS not ON_");
 			await unbanUser(chatid);
