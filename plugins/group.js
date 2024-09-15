@@ -1,57 +1,5 @@
-const { Module, parsedJid } = require("../lib/");
-const { banUser, unbanUser, isBanned } = require("../lib/db/ban");
+const { Module, parsedJid, isAdmin } = require("../lib/");
 const moment = require("moment");
-const { jidDecode } = require("baileys");
-
-const isAdmin = async (jid, user, client) => {
-	const groupMetadata = await client.groupMetadata(jid);
-	const groupAdmins = groupMetadata.participants.filter(p => p.admin !== null).map(p => p.id);
-	const normalized = jidDecode(user).user + "@s.whatsapp.net";
-	return groupAdmins.includes(normalized);
-};
-
-Module(
-	{
-		on: "message",
-		fromMe: true,
-		dontAddCommandList: true,
-	},
-	async (message, match) => {
-		if (!message.isBaileys) return;
-		const isban = await isBanned(message.jid);
-		if (!isban) return;
-		await message.reply("_Bot is banned in this chat_");
-		const jid = parsedJid(message.participant);
-		return await message.client.groupParticipantsUpdate(message.jid, jid, "remove");
-	},
-);
-
-Module(
-	{
-		pattern: "antibot ?(.*)",
-		fromMe: true,
-		desc: "Turn antibot on or off",
-		type: "group",
-	},
-	async (message, match, client) => {
-		if (!message.isGroup) return await message.reply("_This command is for groups_");
-		const isUserAdmin = await isAdmin(message.jid, message.participant, client);
-		if (!isUserAdmin) return await message.reply("_You need to be an admin to use this command_");
-		const chatid = message.jid;
-		const command = match.trim().toLowerCase();
-		if (command !== "on" && command !== "off") return await message.reply("Usage: .antibot on/off");
-		const isban = await isBanned(chatid);
-		if (command === "on") {
-			if (isban) return await message.reply("*_Antibot Already On_*");
-			await banUser(chatid);
-			return await message.reply("*_Antibot Turned ON_*");
-		} else if (command === "off") {
-			if (!isban) return await message.reply("*_Antibot not ON in this Chat_*");
-			await unbanUser(chatid);
-			return await message.reply("*_Antibot turned Off_*");
-		}
-	},
-);
 
 Module(
 	{
