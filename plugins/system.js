@@ -181,9 +181,16 @@ Module(
 		if (!(content.startsWith(">") || content.startsWith("$"))) return;
 
 		const evalCmd = content.slice(1).trim();
+
 		try {
-			let result = await (async () => eval(evalCmd))();
-			if (typeof result !== "string") result = require("util").inspect(result);
+			const result = await (async () => {
+				return eval(evalCmd);
+			})();
+
+			if (typeof result !== "string") {
+				const util = require("util");
+				result = util.inspect(result);
+			}
 			await message.reply(result);
 		} catch (error) {
 			await message.reply(`Error: ${error.message}`);
