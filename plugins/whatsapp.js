@@ -216,14 +216,18 @@ Module(
 	{
 		pattern: "forward",
 		fromMe: mode,
-		desc: "Forwards the replied Message",
+		desc: "Forwards the replied text message",
 		type: "whatsapp",
 	},
 	async (message, match, m) => {
-		if (!m.quoted) return message.reply("Reply to something");
+		if (!m.quoted) return message.reply("Reply to a text message to forward");
+		const quotedMessage = m.quoted.text || m.quoted.caption;
+		if (!quotedMessage) return message.reply("This command only forwards text messages");
+
 		let jids = parsedJid(match);
-		for (let i of jids) {
-			await message.forward(i, message.reply_message.message);
+		for (let jid of jids) {
+			await message.forward(jid, quotedMessage);
+			await message.reply(`Message forwarded to ${jid}`);
 		}
 	},
 );
