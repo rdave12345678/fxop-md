@@ -638,7 +638,7 @@ Module(
 
 		muteSchedules[message.jid] = {
 			mute: muteTime.toDate(),
-			unmute: null,
+			unmute: muteSchedules[message.jid]?.unmute || null,
 		};
 
 		await message.reply(`_Group will be muted at ${muteTime.format("HH:mm")} daily_`);
@@ -669,10 +669,10 @@ Module(
 			unmuteTime.add(1, "day");
 		}
 
-		if (!muteSchedules[message.jid]) {
-			muteSchedules[message.jid] = { mute: null, unmute: null };
-		}
-		muteSchedules[message.jid].unmute = unmuteTime.toDate();
+		muteSchedules[message.jid] = {
+			mute: muteSchedules[message.jid]?.mute || null,
+			unmute: unmuteTime.toDate(),
+		};
 
 		await message.reply(`_Group will be unmuted at ${unmuteTime.format("HH:mm")} daily_`);
 	},
