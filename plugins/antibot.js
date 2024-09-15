@@ -24,10 +24,9 @@ Module(
 		desc: "Turn antibot on or off",
 		type: "group",
 	},
-	async (message, match) => {
+	async (message, match, m, client) => {
 		if (!message.isGroup) return await message.reply("_This command is for groups_");
-		const isUserAdmin = await isAdmin(message.jid, message.participant, client);
-		if (!isUserAdmin) return await message.reply("_You need to be an admin to use this command_");
+		if (!isAdmin(message.jid, message.user, message.client)) return await message.reply("_I'm not admin_");
 		const chatid = message.jid;
 		const command = match.trim().toLowerCase();
 		if (command !== "on" && command !== "off") return await message.reply("Usage: .antibot on/off");
