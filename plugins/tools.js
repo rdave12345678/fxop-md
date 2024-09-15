@@ -73,3 +73,20 @@ Module(
 		return await message.send(shorten_text);
 	},
 );
+
+Module(
+	{
+		pattern: "fullss",
+		fromMe: mode,
+		desc: "ScreenShot Websites",
+		type: "tools",
+	},
+	async (message, match, m) => {
+		if (!match) return await message.sendReply("_Provide Url_");
+		if (!isUrl(match)) return await message.sendReply("_Not A URL" + message.pushName + "_");
+		const msg = await message.reply("_Processing URL_");
+		const buff = await ssweb(match);
+		await msg.edit("*_Success_*");
+		return await message.send(buff);
+	},
+);
