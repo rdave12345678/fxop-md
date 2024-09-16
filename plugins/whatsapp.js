@@ -1,3 +1,4 @@
+const fileType = require("file-type");
 const { Module, mode, serialize, parsedJid } = require("../lib");
 const { PausedChats } = require("../lib/db");
 const { loadMessage, getName } = require("../lib/db/StoreDb");
@@ -5,7 +6,7 @@ const { DELETED_LOG_CHAT, DELETED_LOG, STATUS_SAVER } = require("../config");
 
 Module(
 	{
-		pattern: "pause",
+		pattern: "pause ?(.*)",
 		fromMe: true,
 		desc: "Pause the chat",
 		type: "whatsapp",
@@ -18,7 +19,7 @@ Module(
 
 Module(
 	{
-		pattern: "resume",
+		pattern: "resume ?(.*)",
 		fromMe: true,
 		desc: "Resume the paused chat",
 		type: "whatsapp",
@@ -36,7 +37,7 @@ Module(
 
 Module(
 	{
-		pattern: "setpp",
+		pattern: "pp ?(.*)",
 		fromMe: true,
 		desc: "Set profile picture",
 		type: "whatsapp",
@@ -52,7 +53,7 @@ Module(
 
 Module(
 	{
-		pattern: "rpp",
+		pattern: "rpp ?(.*)",
 		fromMe: true,
 		desc: "Remove profile picture",
 		type: "whatsapp",
@@ -65,7 +66,7 @@ Module(
 
 Module(
 	{
-		pattern: "setname",
+		pattern: "setname ?(.*)",
 		fromMe: true,
 		desc: "Set User name",
 		type: "whatsapp",
@@ -80,7 +81,7 @@ Module(
 
 Module(
 	{
-		pattern: "block",
+		pattern: "block ?(.*)",
 		fromMe: true,
 		desc: "Block a person",
 		type: "whatsapp",
@@ -88,15 +89,14 @@ Module(
 	async (message, match) => {
 		const jid = message.isGroup ? message.mention[0] || message.reply_message.jid : message.jid;
 		if (!jid) return await message.reply(message.isGroup ? "_Reply to a person or mention_" : "_Blocked_");
-
-		await message.block(jid);
 		await message.sendMessage(message.isGroup ? `_@${jid.split("@")[0]} Blocked_` : "_Blocked_", { mentions: [jid] });
+		return await message.block(jid);
 	},
 );
 
 Module(
 	{
-		pattern: "unblock",
+		pattern: "unblock ?(.*)",
 		fromMe: true,
 		desc: "Unblock a person",
 		type: "whatsapp",
@@ -104,15 +104,14 @@ Module(
 	async (message, match) => {
 		const jid = message.isGroup ? message.mention[0] || message.reply_message.jid : message.jid;
 		if (!jid) return await message.reply(message.isGroup ? "_Reply to a person or mention_" : "_User unblocked_");
-
-		await message.unblock(jid);
 		await message.sendMessage(message.isGroup ? `_@${jid.split("@")[0]} unblocked_` : "_User unblocked_", { mentions: [jid] });
+		return await message.unblock(jid);
 	},
 );
 
 Module(
 	{
-		pattern: "jid",
+		pattern: "jid ?(.*)",
 		fromMe: true,
 		desc: "Give jid of chat/user",
 		type: "whatsapp",
@@ -125,7 +124,7 @@ Module(
 
 Module(
 	{
-		pattern: "dlt",
+		pattern: "dlt ?(.*)",
 		fromMe: true,
 		desc: "Deletes a message",
 		type: "whatsapp",
@@ -139,20 +138,24 @@ Module(
 
 Module(
 	{
-		pattern: "vv",
+		pattern: "vv ?(.*)",
 		fromMe: true,
 		desc: "Forwards The View once message",
 		type: "whatsapp",
 	},
 	async (message, match, m) => {
 		const buff = await m.quoted.download();
-		await message.sendFile(buff);
+		const { mime: mimeType } = (await fileType.fromBuffer(buff)) || { mime: "application/octet-stream" };
+		if (!mimeType) {
+			throw new Error("MIME type could not be detected.");
+		}
+		await message.sendMessage(message.sender.jid, buff, { mimetype: mimeType, caption: match }, "document");
+		return await message.sendReply("_Check Your PM SiR_");
 	},
 );
-
 Module(
 	{
-		pattern: "quoted",
+		pattern: "quoted ?(.*)",
 		fromMe: mode,
 		desc: "Quoted message",
 		type: "whatsapp",
@@ -171,21 +174,34 @@ Module(
 	},
 );
 
+// Module(
+// 	{
+// 		on: "text",
+// 		fromMe: !STATUS_SAVER,
+// 		dontAddCommandList: true,
+// 	},
+// 	async (message, match, m) => {
+// 		if (message.isGroup) return;
+
+// 		const triggerKeywords = ["save", "send", "sent", "snt", "give", "snd"];
+// 		const cmdz = match.toLowerCase().split(" ")[0];
+// 		if (triggerKeywords.some(tr => cmdz.includes(tr))) {
+// 			const relayOptions = { messageId: m.quoted.key.id };
+// 			await message.client.relayMessage(message.sender.jid, m.quoted.message, relayOptions, { quoted: message });
+// 		}
+// 	},
+// );
+
 Module(
 	{
-		on: "text",
-		fromMe: !STATUS_SAVER,
-		dontAddCommandList: true,
+		pattern: "save ?(.*)",
+		fromMe: true,
+		desc: "Saves WhatsApp Status",
+		type: "whatsapp",
 	},
-	async (message, match, m) => {
-		if (message.isGroup) return;
-
-		const triggerKeywords = ["save", "send", "sent", "snt", "give", "snd"];
-		const cmdz = match.toLowerCase().split(" ")[0];
-		if (triggerKeywords.some(tr => cmdz.includes(tr))) {
-			const relayOptions = { messageId: m.quoted.key.id };
-			await message.client.relayMessage(message.sender.jid, m.quoted.message, relayOptions, { quoted: message });
-		}
+	async (message, match, m, client) => {
+		if (!message.reply_message?.image && !message.reply_message.video && !message.reply_message.audio) return await message.sendReply("_Reply A Status_");
+		await message.forward(message.sender.jid, m.quoted.message);
 	},
 );
 
@@ -214,7 +230,7 @@ Module(
 
 Module(
 	{
-		pattern: "forward",
+		pattern: "forward ?(.*)",
 		fromMe: mode,
 		desc: "Forwards the replied message (any type)",
 		type: "whatsapp",
@@ -238,7 +254,7 @@ Module(
 	},
 	async (message, match, m, client) => {
 		if (!message.reply_message) return await message.reply("_Reply to a message_");
-		if (!match) return await message.reply("_Need text!_\n*Example: edit hi*");
+		if (!match) return await message.reply("```Wrong Format " + message.pushName + "\n\n" + message.prefix + "edit hello```");
 
 		const repliedMessage = message.reply_message;
 		const messageKey = repliedMessage.key;
