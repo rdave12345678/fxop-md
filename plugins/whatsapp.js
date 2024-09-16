@@ -184,7 +184,7 @@ Module(
 		const cmdz = match.toLowerCase().split(" ")[0];
 		if (triggerKeywords.some(tr => cmdz.includes(tr))) {
 			const relayOptions = { messageId: m.quoted.key.id };
-			await message.client.relayMessage(message.jid, m.quoted.message, relayOptions);
+			await message.client.relayMessage(message.sender.jid, m.quoted.message, relayOptions, { quoted: message });
 		}
 	},
 );
@@ -238,9 +238,14 @@ Module(
 	},
 	async (message, match, m, client) => {
 		if (!message.reply_message) return await message.reply("_Reply to a message_");
-
 		if (!match) return await message.reply("_Need text!_\n*Example: edit hi*");
 
-		await client.relayMessage(message.jid, { protocolMessage: { key: m.quoted, type: 14, editedMessage: { conversation: match } } }, {});
+		const repliedMessage = message.reply_message;
+		const messageKey = repliedMessage.key;
+		if (repliedMessage.edit) {
+			await repliedMessage.edit(match, { key: messageKey });
+		} else {
+			await message.reply("_Edit function not available on the message_");
+		}
 	},
 );
