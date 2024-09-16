@@ -170,141 +170,23 @@ Module(
 		return await message.send(commandListText);
 	},
 );
-
-const preBuiltFunctions = {
-	log: (message, ...args) => message.send(args.join(" ")),
-	fetch: async url => {
-		if (!/^https?:\/\//i.test(url)) {
-			url = `https://${url}`;
-		}
-		const response = await require("node-fetch")(url);
-		return response.text();
-	},
-	fetchJson: async url => {
-		if (!/^https?:\/\//i.test(url)) {
-			url = `https://${url}`;
-		}
-		const response = await require("node-fetch")(url, {
-			headers: { Accept: "application/json" },
-		});
-		if (!response.ok) {
-			throw new Error(`Failed to fetch JSON from ${url}: ${response.statusText}`);
-		}
-		return response.json();
-	},
-	post: async (url, data) => {
-		if (!/^https?:\/\//i.test(url)) {
-			url = `https://${url}`;
-		}
-		const response = await require("node-fetch")(url, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(data),
-		});
-		if (!response.ok) {
-			throw new Error(`Failed to post to ${url}: ${response.statusText}`);
-		}
-		return response.text();
-	},
-	buffer: async url => {
-		if (!/^https?:\/\//i.test(url)) {
-			url = `https://${url}`;
-		}
-		const response = await require("node-fetch")(url);
-		if (!response.ok) {
-			throw new Error(`Failed to fetch buffer from ${url}: ${response.statusText}`);
-		}
-		return response.buffer();
-	},
-	jsKeywords: {
-		undefined: undefined,
-		null: null,
-		true: true,
-		false: false,
-		NaN: NaN,
-		Infinity: Infinity,
-		String: String,
-		Number: Number,
-		Object: Object,
-		Array: Array,
-		Function: Function,
-		RegExp: RegExp,
-		Date: Date,
-		Error: Error,
-		Promise: Promise,
-		let: "let",
-		const: "const",
-		var: "var",
-		if: "if",
-		else: "else",
-		switch: "switch",
-		case: "case",
-		default: "default",
-		for: "for",
-		while: "while",
-		do: "do",
-		break: "break",
-		continue: "continue",
-		return: "return",
-		try: "try",
-		catch: "catch",
-		finally: "finally",
-		throw: "throw",
-		class: "class",
-		extends: "extends",
-		super: "super",
-		import: "import",
-		export: "export",
-		new: "new",
-		delete: "delete",
-		typeof: "typeof",
-		instanceof: "instanceof",
-		in: "in",
-		this: "this",
-		void: "void",
-		with: "with",
-		yield: "yield",
-		async: "async",
-		await: "await",
-		debugger: "debugger",
-		eval: "eval",
-		arguments: "arguments",
-	},
-};
-
 Module(
 	{
 		on: "text",
-		fromMe: false,
+		fromMe: true,
 		dontAddCommandList: true,
 	},
-	async message => {
+	async (message, match) => {
 		const content = message.text;
 		if (!content) return;
 		if (!(content.startsWith(">") || content.startsWith("$"))) return;
 
 		const evalCmd = content.slice(1).trim();
-
 		try {
-			const { jsKeywords, ...functions } = preBuiltFunctions;
-			const context = { ...jsKeywords, ...functions, message, require };
-			let result = await eval(`
-				(async () => {
-					with (context) {
-						try {
-							${evalCmd} 
-						} catch (err) {
-							return 'Error: ' + err.message;
-						}
-					}
-				})();
-			`);
-			if (typeof result !== "string") {
-				result = util.inspect(result, { depth: null });
-			}
-			preBuiltFunctions.log(message, `Result: ${result}`);
+			let result = await eval(evalCmd);
+			if (typeof result !== "string") result = require("util").inspect(result);
+			await message.reply(result);
 		} catch (error) {
-			preBuiltFunctions.log(message, `Error: ${error.message}`);
 			await message.reply(`Error: ${error.message}`);
 		}
 	},

@@ -1,8 +1,6 @@
-const { Module, mode, getJson, lyrics, sleep } = require("../lib");
+const { Module, mode, getJson, lyrics, sleep, Google, getFloor, onwhatsapp } = require("../lib");
 const moment = require("moment");
-const getFloor = function (number) {
-	return Math.floor(number);
-};
+
 Module(
 	{
 		pattern: "fx1",
@@ -93,6 +91,7 @@ Module(
 		return message.send(`*Active Stock Tickers (Limit: ${limit}):*\n\n${output}`, { quoted: message });
 	},
 );
+
 Module(
 	{
 		pattern: "weather ?(.*)",
@@ -114,11 +113,11 @@ Module(
 	{
 		pattern: "lyrics ?(.*)",
 		fromMe: mode,
-		desc: "Serach lyrics of Song",
+		desc: "Search lyrics of Song",
 		type: "search",
 	},
 	async (message, match) => {
-		if (!match) return await message.sendReply(`\`\`\`Wrong formart\n\n${message.prefix}lyrics Just the two of Us\`\`\``);
+		if (!match) return await message.sendReply(`\`\`\`Wrong format\n\n${message.prefix}lyrics Just the two of Us\`\`\``);
 		const msg = await message.reply("_Searching for '" + match + "'_");
 		const songLyrics = await lyrics(match);
 		await msg.edit("_Lyrics Found!_");
@@ -127,3 +126,33 @@ Module(
 	},
 );
 
+Module(
+	{
+		pattern: "google ?(.*)",
+		fromMe: mode,
+		desc: "Search Google",
+		type: "search",
+	},
+	async (message, match) => {
+		if (!match) return await message.sendReply("_Provide Me A Query" + message.pushName + "_\n\n" + message.prefix + "google fxop-md");
+		const msg = await message.reply("_Searching for " + match + "_");
+		const res = await Google(match);
+		return await msg.edit(res);
+	},
+);
+
+Module(
+	{
+		pattern: "onwa ?(.*)",
+		fromMe: mode,
+		desc: "Checks if a number exists on WhatsApp",
+		type: "search",
+	},
+	async (message, match) => {
+		if (!match) return await message.send("*Please provide a phone number.*");
+
+		const phoneNumber = match.trim();
+		const result = await onwhatsapp(phoneNumber);
+		return await message.send(result, { quoted: message });
+	},
+);
